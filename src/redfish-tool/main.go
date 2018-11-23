@@ -8,11 +8,19 @@ import (
 
 func main() {
 	rf := redfish.Redfish{}
+    // Testing with local simulator:
+    //
+    // https://github.com/DMTF/Redfish-Profile-Simulator
+    //
+    // User: root
+    // Password: password123456
+    // Returned token from SessionService: 123456SESSIONauthcode
+    //
 	rcfg := &redfish.RedfishConfiguration{
 		Hostname: "localhost",
-		Port:     8000,
-		Username: "redfish",
-		Password: "1t's s0 f1uffy I'm g0nn4 D13!",
+		Port:     5000,
+		Username: "root",
+		Password: "password123456",
 	}
 
 	fmt.Print("Initialise - ")
@@ -39,5 +47,8 @@ func main() {
 		fmt.Println("OK")
 	}
 
+    fmt.Println("---")
+    fmt.Printf("%+v\n", rcfg)
+    fmt.Println("---")
 	os.Exit(0)
 }
