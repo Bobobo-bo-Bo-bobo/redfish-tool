@@ -9,6 +9,7 @@ type RedfishConfiguration struct {
 	Password       string
 	AuthToken      *string
 	Timeout        time.Duration
+	InsecureSSL    bool
 	rawBaseContent string
 
 	// endpoints

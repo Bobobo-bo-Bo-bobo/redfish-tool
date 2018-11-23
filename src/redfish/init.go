@@ -1,6 +1,7 @@
 package redfish
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,10 +13,22 @@ import (
 func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 	var url string
 	var base baseEndpoint
+	var transp *http.Transport
+
+	if cfg.InsecureSSL {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		}
+	}
 
 	// get URL for SessionService endpoint
 	client := &http.Client{
-		Timeout: cfg.Timeout,
+		Timeout:   cfg.Timeout,
+		Transport: transp,
 	}
 	if cfg.Port > 0 {
 		url = fmt.Sprintf("https://%s:%d/redfish/v1/", cfg.Hostname, cfg.Port)

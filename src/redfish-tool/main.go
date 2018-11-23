@@ -44,6 +44,7 @@ func main() {
         Hostname: host,
         Username: user,
         Password: strings.TrimSpace(string(raw_pass)),
+        InsecureSSL: true,
     }
 
     fmt.Printf("\n%+v\n", rcfg)

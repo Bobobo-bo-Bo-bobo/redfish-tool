@@ -1,6 +1,7 @@
 package redfish
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,15 +14,28 @@ import (
 func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	var url string
 	var sessions sessionServiceEndpoint
+	var transp *http.Transport
 
 	if cfg.Username == "" || cfg.Password == "" {
 		return errors.New(fmt.Sprintf("ERROR: Both Username and Password must be set"))
 	}
 
+	if cfg.InsecureSSL {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		}
+	}
+
 	// get URL for SessionService endpoint
 	client := &http.Client{
-		Timeout: cfg.Timeout,
+		Timeout:   cfg.Timeout,
+		Transport: transp,
 	}
+
 	if cfg.Port > 0 {
 		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.sessionService)
 	} else {

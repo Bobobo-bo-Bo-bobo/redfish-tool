@@ -1,25 +1,34 @@
 package redfish
 
 import (
-	//    "encoding/json"
+	"crypto/tls"
 	"errors"
 	"fmt"
-	//    "io/ioutil"
 	"net/http"
-	//    "strings"
 )
 
 // Logout from SessionEndpoint and delete authentication token for this session
 func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	var url string
+	var transp *http.Transport
 
 	if cfg.AuthToken == nil {
 		// do nothing for Logout when we don't even have an authentication token
 		return nil
 	}
 
+	if cfg.InsecureSSL {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		}
+	}
 	client := &http.Client{
-		Timeout: cfg.Timeout,
+		Timeout:   cfg.Timeout,
+		Transport: transp,
 	}
 
 	if cfg.Port > 0 {
