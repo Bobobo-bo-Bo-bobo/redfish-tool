@@ -1,9 +1,14 @@
 package main
 
 import (
+    "bufio"
 	"fmt"
 	"os"
 	"redfish"
+    "strings"
+    "syscall"
+
+    "golang.org/x/crypto/ssh/terminal"
 )
 
 func main() {
@@ -16,12 +21,32 @@ func main() {
     // Password: password123456
     // Returned token from SessionService: 123456SESSIONauthcode
     //
+    /*
 	rcfg := &redfish.RedfishConfiguration{
 		Hostname: "localhost",
 		Port:     5000,
 		Username: "root",
 		Password: "password123456",
 	}
+*/
+    r := bufio.NewReader(os.Stdin)
+    fmt.Print("Hostname: ")
+    host, _ := r.ReadString('\n')
+    host = strings.TrimSpace(host)
+
+    fmt.Print("User: ")
+    user, _ := r.ReadString('\n')
+    user = strings.TrimSpace(user)
+
+    fmt.Print("Password: ")
+    raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
+    rcfg := &redfish.RedfishConfiguration{
+        Hostname: host,
+        Username: user,
+        Password: strings.TrimSpace(string(raw_pass)),
+    }
+
+    fmt.Printf("\n%+v\n", rcfg)
 
 	fmt.Print("Initialise - ")
 	err := rf.Initialise(rcfg)

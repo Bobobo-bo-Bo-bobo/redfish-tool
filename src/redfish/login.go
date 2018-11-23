@@ -23,9 +23,9 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 		Timeout: cfg.Timeout,
 	}
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("http://%s:%d%s", cfg.Hostname, cfg.Port, cfg.sessionService)
+		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.sessionService)
 	} else {
-		url = fmt.Sprintf("http://%s%s", cfg.Hostname, cfg.sessionService)
+		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.sessionService)
 	}
 
 	// get Sessions endpoint, which requires HTTP Basic auth
@@ -33,6 +33,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	if err != nil {
 		return err
 	}
+
 	request.SetBasicAuth(cfg.Username, cfg.Password)
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
@@ -77,9 +78,9 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	cfg.sessions = *sessions.Sessions.Id
 
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("http://%s:%d%s", cfg.Hostname, cfg.Port, *sessions.Sessions.Id)
+		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, *sessions.Sessions.Id)
 	} else {
-		url = fmt.Sprintf("http://%s%s", cfg.Hostname, *sessions.Sessions.Id)
+		url = fmt.Sprintf("https://%s%s", cfg.Hostname, *sessions.Sessions.Id)
 	}
 
 	jsonPayload := fmt.Sprintf("{ \"UserName\":\"%s\",\"Password\":\"%s\" }", cfg.Username, cfg.Password)
@@ -100,7 +101,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 
 	token := response.Header.Get("x-auth-token")

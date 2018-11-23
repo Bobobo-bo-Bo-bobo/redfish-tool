@@ -18,9 +18,9 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 		Timeout: cfg.Timeout,
 	}
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("http://%s:%d/redfish/v1/", cfg.Hostname, cfg.Port)
+		url = fmt.Sprintf("https://%s:%d/redfish/v1/", cfg.Hostname, cfg.Port)
 	} else {
-		url = fmt.Sprintf("http://%s/redfish/v1/", cfg.Hostname)
+		url = fmt.Sprintf("https://%s/redfish/v1/", cfg.Hostname)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
