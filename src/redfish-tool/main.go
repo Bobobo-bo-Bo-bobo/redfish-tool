@@ -61,7 +61,7 @@ func main() {
 		fmt.Println(err)
 	} else {
 		fmt.Println("OK")
-		fmt.Printf(" + Session stored at %s\n", *rcf.SessionLocation)
+		fmt.Printf(" + Session stored at %s\n", *rcfg.SessionLocation)
 		fmt.Printf(" + X-Auth-Token: %s\n", *rcfg.AuthToken)
 	}
 
