@@ -51,18 +51,23 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	request.SetBasicAuth(cfg.Username, cfg.Password)
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
+	request.Close = true
 
 	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}
 
+	response.Close = true
+
 	if response.StatusCode != 200 {
+		response.Body.Close()
 		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 
 	raw, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		response.Body.Close()
 		return err
 	}
 
@@ -76,15 +81,18 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	// check if management boards reports "ServiceEnabled" and if it does, check if is true
 	if sessions.Enabled != nil {
 		if !*sessions.Enabled {
+			response.Body.Close()
 			return errors.New(fmt.Sprintf("ERROR: Session information from %s reports session service as disabled\n", url))
 		}
 	}
 
 	if sessions.Sessions == nil {
+		response.Body.Close()
 		return errors.New(fmt.Sprintf("BUG: No Sessions endpoint reported from %s\n", url))
 	}
 
 	if sessions.Sessions.Id == nil {
+		response.Body.Close()
 		return errors.New(fmt.Sprintf("BUG: Malformed Sessions endpoint reported from %s: no @odata.id field found\n", url))
 	}
 
@@ -105,16 +113,15 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/json")
+	request.Close = true
 
 	response, err = client.Do(request)
 	if err != nil {
 		return err
 	}
 
-	// consume the HTTP body but we don't care about the content
-	_, _ = ioutil.ReadAll(response.Body)
-
-	defer response.Body.Close()
+	response.Close = true
+	response.Body.Close()
 
 	if response.StatusCode != 200 && response.StatusCode != 201 {
 		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\" or \"201 Created\"", url, response.Status))
@@ -129,6 +136,15 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	session := response.Header.Get("location")
 	if session == "" {
 		return errors.New(fmt.Sprintf("BUG: HTTP POST to SessionService endpoint %s returns OK but has no Location in reply", url))
+	}
+
+	// check if is a full URL
+	if session[0] == '/' {
+		if cfg.Port > 0 {
+			session = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, session)
+		} else {
+			session = fmt.Sprintf("https://%s%s", cfg.Hostname, session)
+		}
 	}
 	cfg.SessionLocation = &session
 
