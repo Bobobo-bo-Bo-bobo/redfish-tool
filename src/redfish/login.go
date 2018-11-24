@@ -111,11 +111,13 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 		return err
 	}
 
+	// consume the HTTP body but we don't care about the content
+	_, _ = ioutil.ReadAll(response.Body)
+
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 && response.StatusCode != 201 {
-		response.Body.Close()
-		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\" or \"201 Created\"", url, response.Status))
+		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\" or \"201 Created\"", url, response.Status))
 	}
 
 	token := response.Header.Get("x-auth-token")
