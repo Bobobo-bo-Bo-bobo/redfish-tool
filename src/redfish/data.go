@@ -11,6 +11,7 @@ type RedfishConfiguration struct {
 	SessionLocation *string
 	Timeout         time.Duration
 	InsecureSSL     bool
+	Verbose         bool
 	rawBaseContent  string
 
 	// endpoints

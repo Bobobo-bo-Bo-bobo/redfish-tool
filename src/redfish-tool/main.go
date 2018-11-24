@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"redfish"
@@ -12,42 +12,34 @@ import (
 )
 
 func main() {
+	insecure := flag.Bool("insecure", false, "Skip SSL certificate verification")
+	verbose := flag.Bool("verbose", false, "Verbose operation")
+	ask := flag.Bool("ask", false, "Ask for password")
+	user := flag.String("user", "", "Username to use for authentication")
+	password := flag.String("password", "", "Password to use for authentication")
+	config_file := flag.String("config", "", "Configuration file to use")
+
 	rf := redfish.Redfish{}
-	// Testing with local simulator:
-	//
-	// https://github.com/DMTF/Redfish-Profile-Simulator
-	//
-	// User: root
-	// Password: password123456
-	// Returned token from SessionService: 123456SESSIONauthcode
-	//
-	/*
-		rcfg := &redfish.RedfishConfiguration{
-			Hostname: "localhost",
-			Port:     5000,
-			Username: "root",
-			Password: "password123456",
+
+	if *config_file != "" {
+		// read and parse configuration file
+	} else {
+		if *ask {
+			fmt.Print("Password: ")
+			raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
+			pass := strings.TrimSpace(string(raw_pass))
+			password = &pass
 		}
-	*/
-	r := bufio.NewReader(os.Stdin)
-	fmt.Print("Hostname: ")
-	host, _ := r.ReadString('\n')
-	host = strings.TrimSpace(host)
-
-	fmt.Print("User: ")
-	user, _ := r.ReadString('\n')
-	user = strings.TrimSpace(user)
-
-	fmt.Print("Password: ")
-	raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
+	}
 	rcfg := &redfish.RedfishConfiguration{
-		Hostname:    host,
-		Username:    user,
-		Password:    strings.TrimSpace(string(raw_pass)),
-		InsecureSSL: true,
+		//	Hostname:    hostname,
+		Username:    *user,
+		Password:    *password,
+		InsecureSSL: *insecure,
+		Verbose:     *verbose,
 	}
 
-    fmt.Println("")
+	fmt.Println("")
 	fmt.Print("Initialise - ")
 	err := rf.Initialise(rcfg)
 	if err != nil {
