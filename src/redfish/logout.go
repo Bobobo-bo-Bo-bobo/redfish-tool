@@ -21,6 +21,10 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 		return nil
 	}
 
+	if cfg.SessionLocation == nil || *cfg.SessionLocation == "" {
+		return errors.new(fmt.Sprintf("BUG: X-Auth-Token set (value: %s) but no SessionLocation for this session found\n", *cfg.AuthToken))
+	}
+
 	if cfg.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -36,9 +40,9 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	}
 
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.SessionLocation)
+		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, *cfg.SessionLocation)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.SessionLocation)
+		url = fmt.Sprintf("https://%s%s", cfg.Hostname, *cfg.SessionLocation)
 	}
 
 	request, err := http.NewRequest("DELETE", url, nil)

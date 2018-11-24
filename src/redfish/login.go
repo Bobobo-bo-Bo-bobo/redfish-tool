@@ -85,7 +85,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	}
 
 	if sessions.Sessions.Id == nil {
-		return errors.New(fmt.Sprintf("BUG: Malformed Sessions endpoint reported: no @odata.id field found\n", url))
+		return errors.New(fmt.Sprintf("BUG: Malformed Sessions endpoint reported from %s: no @odata.id field found\n", url))
 	}
 
 	cfg.sessions = *sessions.Sessions.Id
