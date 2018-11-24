@@ -16,6 +16,10 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 		// do nothing for Logout when we don't even have an authentication token
 		return nil
 	}
+	if *cfg.AuthToken == "" {
+		// do nothing for Logout when we don't even have an authentication token
+		return nil
+	}
 
 	if cfg.InsecureSSL {
 		transp = &http.Transport{
@@ -32,9 +36,9 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	}
 
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.sessions)
+		url = fmt.Sprintf("https://%s:%d%s/%s", cfg.Hostname, cfg.Port, cfg.sessions, *cfg.AuthToken)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.sessions)
+		url = fmt.Sprintf("https://%s%s/%s", cfg.Hostname, cfg.sessions, *cfg.AuthToken)
 	}
 
 	request, err := http.NewRequest("DELETE", url, nil)
