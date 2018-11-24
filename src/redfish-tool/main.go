@@ -18,6 +18,15 @@ func main() {
 	user := flag.String("user", "", "Username to use for authentication")
 	password := flag.String("password", "", "Password to use for authentication")
 	config_file := flag.String("config", "", "Configuration file to use")
+	help := flag.Bool("help", false, "Show help text")
+
+	flag.Usage = ShowUsage
+	flag.Parse()
+	if *help {
+		ShowUsage()
+		os.Exit(0)
+	}
+	//    hostList := flag.Args()
 
 	rf := redfish.Redfish{}
 
