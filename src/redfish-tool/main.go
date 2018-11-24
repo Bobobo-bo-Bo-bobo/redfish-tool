@@ -47,8 +47,6 @@ func main() {
 		InsecureSSL: true,
 	}
 
-	fmt.Printf("\n%+v\n", rcfg)
-
 	fmt.Print("Initialise - ")
 	err := rf.Initialise(rcfg)
 	if err != nil {
@@ -63,6 +61,8 @@ func main() {
 		fmt.Println(err)
 	} else {
 		fmt.Println("OK")
+		fmt.Printf(" + Session stored at %s\n", *rcf.SessionLocation)
+		fmt.Printf(" + X-Auth-Token: %s\n", *rcfg.AuthToken)
 	}
 
 	fmt.Print("Logout - ")
@@ -72,9 +72,5 @@ func main() {
 	} else {
 		fmt.Println("OK")
 	}
-
-	fmt.Println("---")
-	fmt.Printf("%+v\n", rcfg)
-	fmt.Println("---")
 	os.Exit(0)
 }

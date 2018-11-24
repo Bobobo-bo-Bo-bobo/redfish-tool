@@ -39,7 +39,7 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 		Transport: transp,
 	}
 
-    url = *cfg.SessionLocation
+	url = *cfg.SessionLocation
 
 	request, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -63,6 +63,7 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	}
 
 	cfg.AuthToken = nil
+	cfg.SessionLocation = nil
 
 	return nil
 }
