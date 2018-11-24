@@ -36,9 +36,9 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	}
 
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s/%s", cfg.Hostname, cfg.Port, cfg.sessions, *cfg.AuthToken)
+		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.SessionLocation)
 	} else {
-		url = fmt.Sprintf("https://%s%s/%s", cfg.Hostname, cfg.sessions, *cfg.AuthToken)
+		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.SessionLocation)
 	}
 
 	request, err := http.NewRequest("DELETE", url, nil)

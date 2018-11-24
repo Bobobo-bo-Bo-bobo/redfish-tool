@@ -3,14 +3,15 @@ package redfish
 import "time"
 
 type RedfishConfiguration struct {
-	Hostname       string
-	Port           int
-	Username       string
-	Password       string
-	AuthToken      *string
-	Timeout        time.Duration
-	InsecureSSL    bool
-	rawBaseContent string
+	Hostname        string
+	Port            int
+	Username        string
+	Password        string
+	AuthToken       *string
+	SessionLocation *string
+	Timeout         time.Duration
+	InsecureSSL     bool
+	rawBaseContent  string
 
 	// endpoints
 	accountService string

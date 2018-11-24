@@ -122,7 +122,13 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	if token == "" {
 		return errors.New(fmt.Sprintf("BUG: HTTP POST to SessionService endpoint %s returns OK but no X-Auth-Token in reply", url))
 	}
-
 	cfg.AuthToken = &token
+
+	session := response.Header.Get("location")
+	if session == "" {
+		return errors.New(fmt.Sprintf("BUG: HTTP POST to SessionService endpoint %s returns OK but has no Location in reply", url))
+	}
+	cfg.SessionLocation = &session
+
 	return nil
 }
