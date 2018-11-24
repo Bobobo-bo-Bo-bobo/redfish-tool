@@ -60,7 +60,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 
 	response.Close = true
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		response.Body.Close()
 		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
@@ -123,7 +123,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	response.Close = true
 	response.Body.Close()
 
-	if response.StatusCode != 200 && response.StatusCode != 201 {
+	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusCreated {
 		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\" or \"201 Created\"", url, response.Status))
 	}
 

@@ -26,7 +26,8 @@ func main() {
 		ShowUsage()
 		os.Exit(0)
 	}
-	//    hostList := flag.Args()
+
+	trailing := flag.Args()
 
 	rf := redfish.Redfish{}
 
@@ -40,6 +41,14 @@ func main() {
 			password = &pass
 		}
 	}
+
+	// get requested command
+	if len(trailing) == 0 {
+		fmt.Fprintf(os.Stderr, "Error: No command defined\n\n")
+		ShowUsage()
+		os.Exit(1)
+	}
+
 	rcfg := &redfish.RedfishConfiguration{
 		//	Hostname:    hostname,
 		Username:    *user,

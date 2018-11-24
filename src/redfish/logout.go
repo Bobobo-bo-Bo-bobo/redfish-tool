@@ -58,7 +58,7 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		return errors.New(fmt.Sprintf("ERROR: HTTP DELETE for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 

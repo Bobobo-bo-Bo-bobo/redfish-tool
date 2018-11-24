@@ -57,7 +57,7 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 	}
 	cfg.rawBaseContent = string(raw)
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 
