@@ -47,6 +47,7 @@ func main() {
 		InsecureSSL: true,
 	}
 
+    fmt.Println("")
 	fmt.Print("Initialise - ")
 	err := rf.Initialise(rcfg)
 	if err != nil {
