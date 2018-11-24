@@ -22,7 +22,7 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	}
 
 	if cfg.SessionLocation == nil || *cfg.SessionLocation == "" {
-		return errors.new(fmt.Sprintf("BUG: X-Auth-Token set (value: %s) but no SessionLocation for this session found\n", *cfg.AuthToken))
+		return errors.New(fmt.Sprintf("BUG: X-Auth-Token set (value: %s) but no SessionLocation for this session found\n", *cfg.AuthToken))
 	}
 
 	if cfg.InsecureSSL {
