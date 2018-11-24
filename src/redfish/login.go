@@ -58,8 +58,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	}
 
 	if response.StatusCode != 200 {
-		response.Body.Close()
-		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 
 	raw, err := ioutil.ReadAll(response.Body)
@@ -114,8 +113,9 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
-		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+	if response.StatusCode != 200 && response.StatusCode != 201 {
+		response.Body.Close()
+		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\" or \"201 Created\"", url, response.Status))
 	}
 
 	token := response.Header.Get("x-auth-token")
