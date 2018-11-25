@@ -76,7 +76,7 @@ func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
 	}
 
 	// Some managementboards (e.g. HPE iLO) don't use roles but an internal ("Oem") privilege map instead
-	if accsvc.RolesEndpoint != nil {
+	if accsvc.RolesEndpoint == nil {
 		return result, nil
 	}
 
