@@ -33,7 +33,9 @@ type BaseRedfish interface {
 	Login(*RedfishConfiguration) error
 	Logout(*RedfishConfiguration) error
 	GetSystems(*RedfishConfiguration) ([]string, error)
+	GetSystemData(*RedfishConfiguration, string) (*SystemData, error)
 	GetAccounts(*RedfishConfiguration) ([]string, error)
+	GetAccountData(*RedfishConfiguration, string) (*AccountData, error)
 }
 
 type Redfish struct {
