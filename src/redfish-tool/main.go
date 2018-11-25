@@ -1,18 +1,19 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"os"
 	"redfish"
 	"strings"
 	"syscall"
+	"time"
 
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 func main() {
+	var err error
 	insecure := flag.Bool("insecure", false, "Skip SSL certificate verification")
 	verbose := flag.Bool("verbose", false, "Verbose operation")
 	ask := flag.Bool("ask", false, "Ask for password")
@@ -20,6 +21,9 @@ func main() {
 	password := flag.String("password", "", "Password to use for authentication")
 	config_file := flag.String("config", "", "Configuration file to use")
 	help := flag.Bool("help", false, "Show help text")
+	hosts := flag.String("host", "", "Hosts to work on")
+	port := flag.Int("port", 0, "Alternate port to connect to")
+	timeout := flag.Int64("timeout", 60, "Connection timeout in seconds")
 
 	flag.Usage = ShowUsage
 	flag.Parse()
@@ -29,14 +33,6 @@ func main() {
 	}
 
 	trailing := flag.Args()
-
-	rf := redfish.Redfish{}
-
-	// FIXME: read data from command line/config file instead of asking for it
-	r := bufio.NewReader(os.Stdin)
-	fmt.Print("Hostname: ")
-	hostname, _ := r.ReadString('\n')
-	hostname = strings.TrimSpace(hostname)
 
 	if *config_file != "" {
 		// read and parse configuration file
@@ -55,104 +51,167 @@ func main() {
 		ShowUsage()
 		os.Exit(1)
 	}
+	command := strings.ToLower(trailing[0])
 
-	rcfg := &redfish.RedfishConfiguration{
-		Hostname:    hostname,
-		Username:    *user,
-		Password:    *password,
-		InsecureSSL: *insecure,
-		Verbose:     *verbose,
+	if *hosts == "" {
+		fmt.Fprintf(os.Stderr, "Error: No destination host given\n\n")
+		ShowUsage()
+		os.Exit(1)
 	}
 
-	fmt.Println("")
-	fmt.Print("Initialise - ")
-	err := rf.Initialise(rcfg)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
+	if *timeout < 0 {
+		fmt.Fprintf(os.Stderr, "Error: Invalid timeout %d; must be >= 0\n\n", *timeout)
+		os.Exit(2)
 	}
 
-	fmt.Print("Login - ")
-	err = rf.Login(rcfg)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-		fmt.Printf(" + Session stored at %s\n", *rcfg.SessionLocation)
-		fmt.Printf(" + X-Auth-Token: %s\n", *rcfg.AuthToken)
-	}
+	host_list := strings.Split(*hosts, ",")
+	for _, host := range host_list {
+		rcfg := &redfish.RedfishConfiguration{
+			Hostname:    host,
+			Port:        *port,
+			Username:    *user,
+			Password:    *password,
+			InsecureSSL: *insecure,
+			Verbose:     *verbose,
+			Timeout:     time.Duration(*timeout) * time.Second,
+		}
 
-	fmt.Print("Systems - ")
-	sys, err := rf.GetSystems(rcfg)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-		fmt.Printf(" + %d systems reported\n", len(sys))
+		// XXX: optionally parse additional and command specific command lines
 
-		for _, s := range sys {
-			fmt.Printf("  * %s\n", s)
+		rf := redfish.Redfish{}
+
+		// Initialize session
+		err = rf.Initialise(rcfg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Initialisation failed for %s: %s\n", host, err.Error())
+			continue
+		}
+
+		// Login
+		err = rf.Login(rcfg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR: Login to %s failed: %s\n", host, err.Error())
+			continue
+		}
+
+		if command == "get-all-users" {
+			err = GetAllUsers(rf, rcfg)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s", err.Error())
+			}
+		} // XXX: ...
+
+		// Logout
+		err = rf.Logout(rcfg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "WARNING: Logout from %s failed: %s\n", host, err.Error())
 		}
 	}
 
-	fmt.Printf("System: %s - ", sys[0])
-	ssys, err := rf.GetSystemData(rcfg, sys[0])
 	if err != nil {
-		fmt.Println(err)
+		os.Exit(1)
 	} else {
-		fmt.Println("OK")
-		fmt.Printf("%+v\n", ssys)
+		os.Exit(0)
 	}
 
-	fmt.Print("Accounts - ")
-	accs, err := rf.GetAccounts(rcfg)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-		fmt.Printf(" + %d accounts reported\n", len(accs))
-		for _, a := range accs {
-			fmt.Printf("  * %s\n", a)
+	/*
+		rcfg := &redfish.RedfishConfiguration{
+			Hostname:    hostname,
+			Username:    *user,
+			Password:    *password,
+			InsecureSSL: *insecure,
+			Verbose:     *verbose,
 		}
-	}
 
-	fmt.Printf("Account: %s - ", accs[0])
-	acc, err := rf.GetAccountData(rcfg, accs[0])
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-		fmt.Printf("%+v\n", acc)
-	}
-
-	fmt.Print("Roles - ")
-	roles, err := rf.GetRoles(rcfg)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-		fmt.Printf(" + %d roles reported\n", len(roles))
-		for _, a := range roles {
-			fmt.Printf("  * %s\n", a)
+		fmt.Println("")
+		fmt.Print("Initialise - ")
+		err := rf.Initialise(rcfg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
 		}
-	}
 
-	fmt.Printf("Role: %s - ", roles[0])
-	role, err := rf.GetRoleData(rcfg, roles[0])
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-		fmt.Printf("%+v\n", role)
-	}
+		fmt.Print("Login - ")
+		err = rf.Login(rcfg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf(" + Session stored at %s\n", *rcfg.SessionLocation)
+			fmt.Printf(" + X-Auth-Token: %s\n", *rcfg.AuthToken)
+		}
 
-	fmt.Print("Logout - ")
-	err = rf.Logout(rcfg)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println("OK")
-	}
-	os.Exit(0)
+		fmt.Print("Systems - ")
+		sys, err := rf.GetSystems(rcfg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf(" + %d systems reported\n", len(sys))
+
+			for _, s := range sys {
+				fmt.Printf("  * %s\n", s)
+			}
+		}
+
+		fmt.Printf("System: %s - ", sys[0])
+		ssys, err := rf.GetSystemData(rcfg, sys[0])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf("%+v\n", ssys)
+		}
+
+		fmt.Print("Accounts - ")
+		accs, err := rf.GetAccounts(rcfg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf(" + %d accounts reported\n", len(accs))
+			for _, a := range accs {
+				fmt.Printf("  * %s\n", a)
+			}
+		}
+
+		fmt.Printf("Account: %s - ", accs[0])
+		acc, err := rf.GetAccountData(rcfg, accs[0])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf("%+v\n", acc)
+		}
+
+		fmt.Print("Roles - ")
+		roles, err := rf.GetRoles(rcfg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf(" + %d roles reported\n", len(roles))
+			for _, a := range roles {
+				fmt.Printf("  * %s\n", a)
+			}
+		}
+
+		fmt.Printf("Role: %s - ", roles[0])
+		role, err := rf.GetRoleData(rcfg, roles[0])
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+			fmt.Printf("%+v\n", role)
+		}
+
+		fmt.Print("Logout - ")
+		err = rf.Logout(rcfg)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println("OK")
+		}
+	*/
 }

@@ -32,5 +32,16 @@ func ShowUsage() {
 		"    	Username to use for authentication\n"+
 		"  -verbose\n"+
 		"    	Verbose operation\n"+
+		"\n"+
+		"Commands:\n"+
+		"\n"+
+		"get-all-users\n"+
+		"\n"+
+		"get-user\n"+
+		"\n"+
+		"get-all-roles\n"+
+		"\n"+
+		"get-role\n"+
+		"\n"+
 		"\n", version)
 }
