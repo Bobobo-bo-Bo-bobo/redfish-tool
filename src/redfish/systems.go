@@ -16,7 +16,7 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 	var transp *http.Transport
 	var result = make([]string, 0)
 
-    if cfg.AuthToken == nil || cfg.AuthToken == "" {
+    if cfg.AuthToken == nil || *cfg.AuthToken == "" {
         return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
     }
 
