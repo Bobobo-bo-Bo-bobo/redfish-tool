@@ -16,6 +16,10 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 	var transp *http.Transport
 	var result = make([]string, 0)
 
+    if cfg.AuthToken == nil || cfg.AuthToken == "" {
+        return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+    }
+
 	if cfg.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
@@ -43,6 +47,8 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
+    request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+
 	request.Close = true
 
 	response, err := client.Do(request)
