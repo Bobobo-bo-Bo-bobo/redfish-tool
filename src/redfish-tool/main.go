@@ -118,7 +118,7 @@ func main() {
 	}
 
 	fmt.Printf("Account: %s - ", accs[0])
-	acc, err := GetAccount(rcfg, accs[0])
+	acc, err := GetAccountData(rcfg, accs[0])
 	if err != nil {
 		fmt.Println(err)
 	} else {
