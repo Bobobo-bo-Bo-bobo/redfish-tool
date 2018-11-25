@@ -55,3 +55,13 @@ type SystemData struct {
 type AccountService struct {
 	AccountsEndpoint *OData `json:"Accounts"`
 }
+
+type AccountData struct {
+	Id       *string `json:"Id"`
+	Name     *string `json:"Name"`
+	UserName *string `json:"UserName"`
+	Password *string `json:"Password"`
+	RoleId   *string `json:"RoleId"`
+	Enabled  *bool   `json:"Enabled"`
+	Locked   *bool   `json:"Locked"`
+}

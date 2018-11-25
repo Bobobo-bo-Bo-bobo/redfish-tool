@@ -117,6 +117,15 @@ func main() {
 		}
 	}
 
+	fmt.Printf("Account: %s - ", accs[0])
+	acc, err := GetAccount(rcfg, accs[0])
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("OK")
+		fmt.Printf("%+v\n", acc)
+	}
+
 	fmt.Print("Logout - ")
 	err = rf.Logout(rcfg)
 	if err != nil {
