@@ -1,10 +1,11 @@
 package redfish
 
 type oData struct {
-	Id      *string `json:"@odata.id"`
-	Type    *string `json:"@odata.type"`
-	Context *string `json:"@odata.context"`
-	Members []oData `json:"Members"`
+	Id           *string `json:"@odata.id"`
+	Type         *string `json:"@odata.type"`
+	Context      *string `json:"@odata.context"`
+	Members      []oData `json:"Members"`
+	MembersCount int     `json:"Members@odata.count"`
 }
 
 type baseEndpoint struct {

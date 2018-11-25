@@ -50,14 +50,14 @@ func (r *Redfish) Logout(cfg *RedfishConfiguration) error {
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
-    request.Close = true
+	request.Close = true
 
 	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}
 
-    response.Close = true
+	response.Close = true
 
 	defer response.Body.Close()
 

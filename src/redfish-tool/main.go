@@ -76,6 +76,19 @@ func main() {
 		fmt.Printf(" + X-Auth-Token: %s\n", *rcfg.AuthToken)
 	}
 
+	fmt.Print("Systems - ")
+	sys, err := rf.GetSystems(rcfg)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("OK")
+		fmt.Printf(" + %d systems reported\n", len(sys))
+
+		for _, s := range sys {
+			fmt.Printf("  * %s\n", s)
+		}
+	}
+
 	fmt.Print("Logout - ")
 	err = rf.Logout(rcfg)
 	if err != nil {
