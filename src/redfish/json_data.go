@@ -71,7 +71,7 @@ type RoleData struct {
 	Id                 *string  `json:"Id"`
 	Name               *string  `json:"Name"`
 	IsPredefined       *bool    `json:"IsPredefined"`
-	Description        *bool    `json:"Description"`
+	Description        *string  `json:"Description"`
 	AssignedPrivileges []string `json:"AssignedPrivileges"`
 	//    OemPrivileges   []string    `json:"OemPrivileges"`
 }
