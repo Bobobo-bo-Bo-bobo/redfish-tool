@@ -1,23 +1,53 @@
 package redfish
 
-type oData struct {
+type OData struct {
 	Id           *string `json:"@odata.id"`
 	Type         *string `json:"@odata.type"`
 	Context      *string `json:"@odata.context"`
-	Members      []oData `json:"Members"`
+	Members      []OData `json:"Members"`
 	MembersCount int     `json:"Members@odata.count"`
 }
 
 type baseEndpoint struct {
-	AccountService oData `json:"AccountService"`
-	Chassis        oData `json:"Chassis"`
-	Managers       oData `json:"Managers"`
-	SessionService oData `json:"SessionService"`
-	Systems        oData `json:"Systems"`
+	AccountService OData `json:"AccountService"`
+	Chassis        OData `json:"Chassis"`
+	Managers       OData `json:"Managers"`
+	SessionService OData `json:"SessionService"`
+	Systems        OData `json:"Systems"`
 }
 
 type sessionServiceEndpoint struct {
 	Enabled        *bool  `json:"ServiceEnabled"`
 	SessionTimeout int    `json:"SessionTimeout"`
-	Sessions       *oData `json:"Sessions"`
+	Sessions       *OData `json:"Sessions"`
+}
+
+type Status struct {
+	State  string `json:"State"`
+	Health string `json:"Health"`
+}
+
+type SystemProcessorSummary struct {
+	Count  int    `json:"Count"`
+	Status Status `json:"Status"`
+}
+
+type SystemData struct {
+	UUID         *string `json:"UUID"`
+	Status       Status  `json:"Status"`
+	SerialNumber *string `json:"SerialNumber"`
+	//ProcessorSummary  *SystemProcessorSummary  `json:"ProcessorSummary"`
+	Processors *OData  `json:"Processors"`
+	PowerState *string `json:"Powerstate"`
+	Name       *string `json:"Name"`
+	Model      *string `json:"Model"`
+	//MemorySummary *SystemMemorySummary    `json:"MemorySummary"`
+	Memory             *OData  `json:"Memory"`
+	Manufacturer       *string `json:"Manufacturer"`
+	LogServices        *OData  `json:"LogServices"`
+	Id                 *string `json:"Id"`
+	EthernetInterfaces *OData  `json:"EthernetInterfaces"`
+	BIOSVersion        *string `json:"BiosVersion"`
+	BIOS               *OData  `json:"Bios"`
+	// Actions
 }

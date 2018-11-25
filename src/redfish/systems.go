@@ -12,13 +12,13 @@ import (
 //get array of systems and their endpoints
 func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 	var url string
-	var systems oData
+	var systems OData
 	var transp *http.Transport
 	var result = make([]string, 0)
 
-    if cfg.AuthToken == nil || *cfg.AuthToken == "" {
-        return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
-    }
+	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
 
 	if cfg.InsecureSSL {
 		transp = &http.Transport{
@@ -47,7 +47,7 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-    request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
 
 	request.Close = true
 
@@ -82,4 +82,71 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 		result = append(result, *endpoint.Id)
 	}
 	return result, nil
+}
+
+// get system data for a particular system
+func (r *Redfish) GetSystemData(cfg *RedfishConfiguration, systemEndpoint string) (*SystemData, error) {
+	var result SystemData
+	var url string
+	var transp *http.Transport
+
+	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
+
+	if cfg.InsecureSSL {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		}
+	}
+
+	// get URL for Systems endpoint
+	client := &http.Client{
+		Timeout:   cfg.Timeout,
+		Transport: transp,
+	}
+	if cfg.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, systemEndpoint)
+	} else {
+		url = fmt.Sprintf("https://%s%s", cfg.Hostname, systemEndpoint)
+	}
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("OData-Version", "4.0")
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+
+	request.Close = true
+
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	response.Close = true
+
+	defer response.Body.Close()
+
+	// store unparsed content
+	raw, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return nil, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+	}
+
+	err = json.Unmarshal(raw, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result, nil
 }
