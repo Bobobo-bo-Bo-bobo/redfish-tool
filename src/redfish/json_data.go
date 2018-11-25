@@ -51,3 +51,7 @@ type SystemData struct {
 	BIOS               *OData  `json:"Bios"`
 	// Actions
 }
+
+type AccountService struct {
+	AccountsEndpoint *OData `json:"Accounts"`
+}

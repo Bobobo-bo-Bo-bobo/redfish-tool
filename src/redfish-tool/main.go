@@ -105,6 +105,18 @@ func main() {
 		fmt.Printf("%+v\n", ssys)
 	}
 
+	fmt.Print("Accounts - ")
+	accs, err := rf.GetAccounts(rcfg)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("OK")
+		fmt.Printf(" + %d accounts reported\n", len(accs))
+		for _, a := range accs {
+			fmt.Printf("  * %s\n", a)
+		}
+	}
+
 	fmt.Print("Logout - ")
 	err = rf.Logout(rcfg)
 	if err != nil {
