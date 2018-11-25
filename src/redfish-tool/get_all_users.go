@@ -13,6 +13,7 @@ func GetAllUsers(r redfish.Redfish, cfg *redfish.RedfishConfiguration) error {
 		return err
 	}
 
+	fmt.Println(cfg.Hostname)
 	// loop over all endpoints
 	for _, ae := range ael {
 		acc, err := r.GetAccountData(cfg, ae)
@@ -21,7 +22,7 @@ func GetAllUsers(r redfish.Redfish, cfg *redfish.RedfishConfiguration) error {
 		}
 
 		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		fmt.Println(acc.UserName)
+		fmt.Println(" " + *acc.UserName)
 	}
 
 	return err
