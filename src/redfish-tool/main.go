@@ -1,6 +1,7 @@
 package main
 
 import (
+    "bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -31,6 +32,12 @@ func main() {
 
 	rf := redfish.Redfish{}
 
+    // FIXME: read data from command line/config file instead of asking for it
+    r := bufio.NewReader(os.Stdin)
+    fmt.Print("Hostname: ")
+    hostname, _ := r.ReadString('\n')
+    hostname = strings.TrimSpace(hostname)
+
 	if *config_file != "" {
 		// read and parse configuration file
 	} else {
@@ -50,7 +57,7 @@ func main() {
 	}
 
 	rcfg := &redfish.RedfishConfiguration{
-		//	Hostname:    hostname,
+		Hostname:    hostname,
 		Username:    *user,
 		Password:    *password,
 		InsecureSSL: *insecure,
