@@ -42,11 +42,14 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
+    request.Close = true
 
 	response, err := client.Do(request)
 	if err != nil {
 		return err
 	}
+
+    response.Close = true
 
 	defer response.Body.Close()
 
