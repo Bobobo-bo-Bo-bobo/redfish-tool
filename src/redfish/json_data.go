@@ -54,6 +54,7 @@ type SystemData struct {
 
 type AccountService struct {
 	AccountsEndpoint *OData `json:"Accounts"`
+	RolesEndpoint    *OData `json:"Roles"`
 }
 
 type AccountData struct {
@@ -64,4 +65,13 @@ type AccountData struct {
 	RoleId   *string `json:"RoleId"`
 	Enabled  *bool   `json:"Enabled"`
 	Locked   *bool   `json:"Locked"`
+}
+
+type RoleData struct {
+	Id                 *string  `json:"Id"`
+	Name               *string  `json:"Name"`
+	IsPredefined       *bool    `json:"IsPredefined"`
+	Description        *bool    `json:"Description"`
+	AssignedPrivileges []string `json:"AssignedPrivileges"`
+	//    OemPrivileges   []string    `json:"OemPrivileges"`
 }

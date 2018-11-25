@@ -126,6 +126,27 @@ func main() {
 		fmt.Printf("%+v\n", acc)
 	}
 
+	fmt.Print("Roles - ")
+	roles, err := rf.GetRoles(rcfg)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("OK")
+		fmt.Printf(" + %d roles reported\n", len(roles))
+		for _, a := range roles {
+			fmt.Printf("  * %s\n", a)
+		}
+	}
+
+	fmt.Printf("Role: %s - ", roles[0])
+	role, err := rf.GetRoleData(rcfg, roles[0])
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println("OK")
+		fmt.Printf("%+v\n", role)
+	}
+
 	fmt.Print("Logout - ")
 	err = rf.Logout(rcfg)
 	if err != nil {
