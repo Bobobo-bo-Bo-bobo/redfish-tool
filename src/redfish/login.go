@@ -37,9 +37,9 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	}
 
 	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.sessionService)
+		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.SessionService)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.sessionService)
+		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.SessionService)
 	}
 
 	// get Sessions endpoint, which requires HTTP Basic auth
@@ -96,7 +96,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 		return errors.New(fmt.Sprintf("BUG: Malformed Sessions endpoint reported from %s: no @odata.id field found\n", url))
 	}
 
-	cfg.sessions = *sessions.Sessions.Id
+	cfg.Sessions = *sessions.Sessions.Id
 
 	if cfg.Port > 0 {
 		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, *sessions.Sessions.Id)

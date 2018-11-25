@@ -55,7 +55,7 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 	if err != nil {
 		return err
 	}
-	cfg.rawBaseContent = string(raw)
+	cfg.RawBaseContent = string(raw)
 
 	if response.StatusCode != http.StatusOK {
 		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
@@ -70,27 +70,27 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 	if base.AccountService.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No AccountService endpoint found in base configuration from %s", url))
 	}
-	cfg.accountService = *base.AccountService.Id
+	cfg.AccountService = *base.AccountService.Id
 
 	if base.Chassis.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No Chassis endpoint found in base configuration from %s", url))
 	}
-	cfg.chassis = *base.Chassis.Id
+	cfg.Chassis = *base.Chassis.Id
 
 	if base.Managers.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No Managers endpoint found in base configuration from %s", url))
 	}
-	cfg.managers = *base.Managers.Id
+	cfg.Managers = *base.Managers.Id
 
 	if base.SessionService.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No SessionService endpoint found in base configuration from %s", url))
 	}
-	cfg.sessionService = *base.SessionService.Id
+	cfg.SessionService = *base.SessionService.Id
 
 	if base.Systems.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No Systems endpoint found in base configuration from %s", url))
 	}
-	cfg.systems = *base.Systems.Id
+	cfg.Systems = *base.Systems.Id
 
 	return nil
 }

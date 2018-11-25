@@ -12,15 +12,15 @@ type RedfishConfiguration struct {
 	Timeout         time.Duration
 	InsecureSSL     bool
 	Verbose         bool
-	rawBaseContent  string
+	RawBaseContent  string
 
 	// endpoints
-	accountService string
-	chassis        string
-	managers       string
-	sessionService string
-	sessions       string
-	systems        string
+	AccountService string
+	Chassis        string
+	Managers       string
+	SessionService string
+	Sessions       string
+	Systems        string
 }
 
 type Result struct {
