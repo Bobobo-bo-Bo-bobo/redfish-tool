@@ -42,6 +42,7 @@ func main() {
 			raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
 			pass := strings.TrimSpace(string(raw_pass))
 			password = &pass
+			fmt.Println()
 		}
 	}
 
