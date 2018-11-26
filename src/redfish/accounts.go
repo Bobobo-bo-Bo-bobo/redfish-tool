@@ -10,18 +10,18 @@ import (
 )
 
 //get array of accounts and their endpoints
-func (r *Redfish) GetAccounts(cfg *RedfishConfiguration) ([]string, error) {
+func (r *Redfish) GetAccounts() ([]string, error) {
 	var url string
 	var accsvc AccountService
 	var accs OData
 	var transp *http.Transport
 	var result = make([]string, 0)
 
-	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+	if r.AuthToken == nil || *r.AuthToken == "" {
 		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -33,13 +33,13 @@ func (r *Redfish) GetAccounts(cfg *RedfishConfiguration) ([]string, error) {
 
 	// get URL for Systems endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.AccountService)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.AccountService)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.AccountService)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, r.AccountService)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -48,7 +48,7 @@ func (r *Redfish) GetAccounts(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 
@@ -79,10 +79,10 @@ func (r *Redfish) GetAccounts(cfg *RedfishConfiguration) ([]string, error) {
 		return result, errors.New("BUG: No Accounts endpoint found")
 	}
 
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, *accsvc.AccountsEndpoint.Id)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, *accsvc.AccountsEndpoint.Id)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, *accsvc.AccountsEndpoint.Id)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, *accsvc.AccountsEndpoint.Id)
 	}
 	request, err = http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -91,7 +91,7 @@ func (r *Redfish) GetAccounts(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 
@@ -129,16 +129,16 @@ func (r *Redfish) GetAccounts(cfg *RedfishConfiguration) ([]string, error) {
 }
 
 // get account data for a particular account
-func (r *Redfish) GetAccountData(cfg *RedfishConfiguration, accountEndpoint string) (*AccountData, error) {
+func (r *Redfish) GetAccountData(accountEndpoint string) (*AccountData, error) {
 	var result AccountData
 	var url string
 	var transp *http.Transport
 
-	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+	if r.AuthToken == nil || *r.AuthToken == "" {
 		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -150,13 +150,13 @@ func (r *Redfish) GetAccountData(cfg *RedfishConfiguration, accountEndpoint stri
 
 	// get URL for Systems endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, accountEndpoint)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, accountEndpoint)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, accountEndpoint)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, accountEndpoint)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -165,7 +165,7 @@ func (r *Redfish) GetAccountData(cfg *RedfishConfiguration, accountEndpoint stri
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 

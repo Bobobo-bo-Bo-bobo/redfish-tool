@@ -6,17 +6,17 @@ import (
 	"redfish"
 )
 
-func GetAllUsers(r redfish.Redfish, cfg *redfish.RedfishConfiguration) error {
+func GetAllUsers(r redfish.Redfish) error {
 	// get all account endpoints
-	ael, err := r.GetAccounts(cfg)
+	ael, err := r.GetAccounts()
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(cfg.Hostname)
+	fmt.Println(r.Hostname)
 	// loop over all endpoints
 	for _, ae := range ael {
-		acc, err := r.GetAccountData(cfg, ae)
+		acc, err := r.GetAccountData(ae)
 		if err != nil {
 			return err
 		}

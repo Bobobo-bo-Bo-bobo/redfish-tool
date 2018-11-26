@@ -10,17 +10,17 @@ import (
 )
 
 //get array of systems and their endpoints
-func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
+func (r *Redfish) GetSystems() ([]string, error) {
 	var url string
 	var systems OData
 	var transp *http.Transport
 	var result = make([]string, 0)
 
-	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+	if r.AuthToken == nil || *r.AuthToken == "" {
 		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -32,13 +32,13 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 
 	// get URL for Systems endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.Systems)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.Systems)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.Systems)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, r.Systems)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -47,7 +47,7 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 
@@ -85,16 +85,16 @@ func (r *Redfish) GetSystems(cfg *RedfishConfiguration) ([]string, error) {
 }
 
 // get system data for a particular system
-func (r *Redfish) GetSystemData(cfg *RedfishConfiguration, systemEndpoint string) (*SystemData, error) {
+func (r *Redfish) GetSystemData(systemEndpoint string) (*SystemData, error) {
 	var result SystemData
 	var url string
 	var transp *http.Transport
 
-	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+	if r.AuthToken == nil || *r.AuthToken == "" {
 		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -106,13 +106,13 @@ func (r *Redfish) GetSystemData(cfg *RedfishConfiguration, systemEndpoint string
 
 	// get URL for Systems endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, systemEndpoint)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, systemEndpoint)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, systemEndpoint)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, systemEndpoint)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -121,7 +121,7 @@ func (r *Redfish) GetSystemData(cfg *RedfishConfiguration, systemEndpoint string
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 

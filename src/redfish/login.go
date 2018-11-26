@@ -11,16 +11,16 @@ import (
 )
 
 // Login to SessionEndpoint and get authentication token for this session
-func (r *Redfish) Login(cfg *RedfishConfiguration) error {
+func (r *Redfish) Login() error {
 	var url string
 	var sessions sessionServiceEndpoint
 	var transp *http.Transport
 
-	if cfg.Username == "" || cfg.Password == "" {
+	if r.Username == "" || r.Password == "" {
 		return errors.New(fmt.Sprintf("ERROR: Both Username and Password must be set"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -32,14 +32,14 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 
 	// get URL for SessionService endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
 
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.SessionService)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.SessionService)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.SessionService)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, r.SessionService)
 	}
 
 	// get Sessions endpoint, which requires HTTP Basic auth
@@ -48,7 +48,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 		return err
 	}
 
-	request.SetBasicAuth(cfg.Username, cfg.Password)
+	request.SetBasicAuth(r.Username, r.Password)
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
 	request.Close = true
@@ -96,15 +96,15 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 		return errors.New(fmt.Sprintf("BUG: Malformed Sessions endpoint reported from %s: no @odata.id field found\n", url))
 	}
 
-	cfg.Sessions = *sessions.Sessions.Id
+	r.Sessions = *sessions.Sessions.Id
 
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, *sessions.Sessions.Id)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, *sessions.Sessions.Id)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, *sessions.Sessions.Id)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, *sessions.Sessions.Id)
 	}
 
-	jsonPayload := fmt.Sprintf("{ \"UserName\":\"%s\",\"Password\":\"%s\" }", cfg.Username, cfg.Password)
+	jsonPayload := fmt.Sprintf("{ \"UserName\":\"%s\",\"Password\":\"%s\" }", r.Username, r.Password)
 	request, err = http.NewRequest("POST", url, strings.NewReader(jsonPayload))
 	if err != nil {
 		return err
@@ -131,7 +131,7 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 	if token == "" {
 		return errors.New(fmt.Sprintf("BUG: HTTP POST to SessionService endpoint %s returns OK but no X-Auth-Token in reply", url))
 	}
-	cfg.AuthToken = &token
+	r.AuthToken = &token
 
 	session := response.Header.Get("location")
 	if session == "" {
@@ -140,13 +140,13 @@ func (r *Redfish) Login(cfg *RedfishConfiguration) error {
 
 	// check if is a full URL
 	if session[0] == '/' {
-		if cfg.Port > 0 {
-			session = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, session)
+		if r.Port > 0 {
+			session = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, session)
 		} else {
-			session = fmt.Sprintf("https://%s%s", cfg.Hostname, session)
+			session = fmt.Sprintf("https://%s%s", r.Hostname, session)
 		}
 	}
-	cfg.SessionLocation = &session
+	r.SessionLocation = &session
 
 	return nil
 }

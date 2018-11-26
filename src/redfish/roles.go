@@ -10,18 +10,18 @@ import (
 )
 
 //get array of roles and their endpoints
-func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
+func (r *Redfish) GetRoles() ([]string, error) {
 	var url string
 	var accsvc AccountService
 	var roles OData
 	var transp *http.Transport
 	var result = make([]string, 0)
 
-	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+	if r.AuthToken == nil || *r.AuthToken == "" {
 		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -33,13 +33,13 @@ func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
 
 	// get URL for Systems endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, cfg.AccountService)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.AccountService)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, cfg.AccountService)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, r.AccountService)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -48,7 +48,7 @@ func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 
@@ -80,10 +80,10 @@ func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
 		return result, nil
 	}
 
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, *accsvc.RolesEndpoint.Id)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, *accsvc.RolesEndpoint.Id)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, *accsvc.RolesEndpoint.Id)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, *accsvc.RolesEndpoint.Id)
 	}
 	request, err = http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -92,7 +92,7 @@ func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 
@@ -130,16 +130,16 @@ func (r *Redfish) GetRoles(cfg *RedfishConfiguration) ([]string, error) {
 }
 
 // get role data for a particular role
-func (r *Redfish) GetRoleData(cfg *RedfishConfiguration, roleEndpoint string) (*RoleData, error) {
+func (r *Redfish) GetRoleData(roleEndpoint string) (*RoleData, error) {
 	var result RoleData
 	var url string
 	var transp *http.Transport
 
-	if cfg.AuthToken == nil || *cfg.AuthToken == "" {
+	if r.AuthToken == nil || *r.AuthToken == "" {
 		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -151,13 +151,13 @@ func (r *Redfish) GetRoleData(cfg *RedfishConfiguration, roleEndpoint string) (*
 
 	// get URL for Systems endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", cfg.Hostname, cfg.Port, roleEndpoint)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, roleEndpoint)
 	} else {
-		url = fmt.Sprintf("https://%s%s", cfg.Hostname, roleEndpoint)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, roleEndpoint)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -166,7 +166,7 @@ func (r *Redfish) GetRoleData(cfg *RedfishConfiguration, roleEndpoint string) (*
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *cfg.AuthToken)
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
 

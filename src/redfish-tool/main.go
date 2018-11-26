@@ -67,7 +67,7 @@ func main() {
 
 	host_list := strings.Split(*hosts, ",")
 	for _, host := range host_list {
-		rcfg := &redfish.RedfishConfiguration{
+		rf := redfish.Redfish{
 			Hostname:    host,
 			Port:        *port,
 			Username:    *user,
@@ -79,31 +79,29 @@ func main() {
 
 		// XXX: optionally parse additional and command specific command lines
 
-		rf := redfish.Redfish{}
-
 		// Initialize session
-		err = rf.Initialise(rcfg)
+		err = rf.Initialise()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Initialisation failed for %s: %s\n", host, err.Error())
 			continue
 		}
 
 		// Login
-		err = rf.Login(rcfg)
+		err = rf.Login()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Login to %s failed: %s\n", host, err.Error())
 			continue
 		}
 
 		if command == "get-all-users" {
-			err = GetAllUsers(rf, rcfg)
+			err = GetAllUsers(rf)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s", err.Error())
 			}
 		} // XXX: ...
 
 		// Logout
-		err = rf.Logout(rcfg)
+		err = rf.Logout()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "WARNING: Logout from %s failed: %s\n", host, err.Error())
 		}

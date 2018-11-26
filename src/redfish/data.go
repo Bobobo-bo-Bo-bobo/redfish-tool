@@ -2,7 +2,24 @@ package redfish
 
 import "time"
 
-type RedfishConfiguration struct {
+type Result struct {
+	RawContent *string
+	RawHeaders *string
+}
+
+type BaseRedfish interface {
+	Initialize() error
+	Login() error
+	Logout() error
+	GetSystems() ([]string, error)
+	GetSystemData(string) (*SystemData, error)
+	GetAccounts() ([]string, error)
+	GetAccountData(string) (*AccountData, error)
+	GetRoles() ([]string, error)
+	GetRoleData(string) (*AccountData, error)
+}
+
+type Redfish struct {
 	Hostname        string
 	Port            int
 	Username        string
@@ -21,24 +38,4 @@ type RedfishConfiguration struct {
 	SessionService string
 	Sessions       string
 	Systems        string
-}
-
-type Result struct {
-	RawContent *string
-	RawHeaders *string
-}
-
-type BaseRedfish interface {
-	Initialize(*RedfishConfiguration) error
-	Login(*RedfishConfiguration) error
-	Logout(*RedfishConfiguration) error
-	GetSystems(*RedfishConfiguration) ([]string, error)
-	GetSystemData(*RedfishConfiguration, string) (*SystemData, error)
-	GetAccounts(*RedfishConfiguration) ([]string, error)
-	GetAccountData(*RedfishConfiguration, string) (*AccountData, error)
-	GetRoles(*RedfishConfiguration) ([]string, error)
-	GetRoleData(*RedfishConfiguration, string) (*AccountData, error)
-}
-
-type Redfish struct {
 }

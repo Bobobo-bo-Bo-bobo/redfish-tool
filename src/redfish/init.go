@@ -10,12 +10,12 @@ import (
 )
 
 // Initialise Redfish basic data
-func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
+func (r *Redfish) Initialise() error {
 	var url string
 	var base baseEndpoint
 	var transp *http.Transport
 
-	if cfg.InsecureSSL {
+	if r.InsecureSSL {
 		transp = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		}
@@ -27,13 +27,13 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 
 	// get URL for SessionService endpoint
 	client := &http.Client{
-		Timeout:   cfg.Timeout,
+		Timeout:   r.Timeout,
 		Transport: transp,
 	}
-	if cfg.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d/redfish/v1/", cfg.Hostname, cfg.Port)
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d/redfish/v1/", r.Hostname, r.Port)
 	} else {
-		url = fmt.Sprintf("https://%s/redfish/v1/", cfg.Hostname)
+		url = fmt.Sprintf("https://%s/redfish/v1/", r.Hostname)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -58,7 +58,7 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 	if err != nil {
 		return err
 	}
-	cfg.RawBaseContent = string(raw)
+	r.RawBaseContent = string(raw)
 
 	if response.StatusCode != http.StatusOK {
 		return errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
@@ -73,27 +73,27 @@ func (r *Redfish) Initialise(cfg *RedfishConfiguration) error {
 	if base.AccountService.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No AccountService endpoint found in base configuration from %s", url))
 	}
-	cfg.AccountService = *base.AccountService.Id
+	r.AccountService = *base.AccountService.Id
 
 	if base.Chassis.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No Chassis endpoint found in base configuration from %s", url))
 	}
-	cfg.Chassis = *base.Chassis.Id
+	r.Chassis = *base.Chassis.Id
 
 	if base.Managers.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No Managers endpoint found in base configuration from %s", url))
 	}
-	cfg.Managers = *base.Managers.Id
+	r.Managers = *base.Managers.Id
 
 	if base.SessionService.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No SessionService endpoint found in base configuration from %s", url))
 	}
-	cfg.SessionService = *base.SessionService.Id
+	r.SessionService = *base.SessionService.Id
 
 	if base.Systems.Id == nil {
 		return errors.New(fmt.Sprintf("BUG: No Systems endpoint found in base configuration from %s", url))
 	}
-	cfg.Systems = *base.Systems.Id
+	r.Systems = *base.Systems.Id
 
 	return nil
 }
