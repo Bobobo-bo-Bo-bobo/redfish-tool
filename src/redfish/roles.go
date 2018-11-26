@@ -233,17 +233,17 @@ func (r *Redfish) MapRolesById() (map[string]*RoleData, error) {
 	}
 
 	for _, ro := range rll {
-		r, err := r.GetRoleData(ro)
+		rl, err := r.GetRoleData(ro)
 		if err != nil {
 			return result, err
 		}
 
 		// should NEVER happen
-		if r.Id == nil {
+		if rl.Id == nil {
 			return result, errors.New("ERROR: No Id found or Id is null")
 		}
 
-		result[*r.Id] = r
+		result[*rl.Id] = rl
 	}
 
 	return result, nil

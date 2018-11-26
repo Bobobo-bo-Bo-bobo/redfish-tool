@@ -22,18 +22,18 @@ func GetAllRoles(r redfish.Redfish) error {
 
 	defer r.Logout()
 
-	// get all role endpoints
-	rmap, err := r.MapRolesByName()
+    // get all role endpoints - Note: role names are _NOT_ unique but IDs are!
+	rmap, err := r.MapRolesById()
 	if err != nil {
 		return err
 	}
 
 	fmt.Println(r.Hostname)
 	// loop over all endpoints
-	for rname, rle := range rmap {
+	for rid, rle := range rmap {
 
 		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		fmt.Println(" " + rname)
+		fmt.Println(" " + rid)
 		if rle.Id != nil && *rle.Id != "" {
 			fmt.Println("  Id: " + *rle.Id)
 		}
