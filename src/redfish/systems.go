@@ -148,6 +148,6 @@ func (r *Redfish) GetSystemData(systemEndpoint string) (*SystemData, error) {
 		return nil, err
 	}
 
-    result.SelfEndpoint = &systemEndpoint
+	result.SelfEndpoint = &systemEndpoint
 	return &result, nil
 }

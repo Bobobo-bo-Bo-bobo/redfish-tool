@@ -22,7 +22,7 @@ func GetAllUsers(r redfish.Redfish) error {
 
 	defer r.Logout()
 	// get all account endpoints
-	amap, err := r.MapAccountNames()
+	amap, err := r.MapAccountsByName()
 	if err != nil {
 		return err
 	}
@@ -69,9 +69,9 @@ func GetAllUsers(r redfish.Redfish) error {
 			}
 		}
 
-        if acc.SelfEndpoint != nil {
-            fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
-        }
+		if acc.SelfEndpoint != nil {
+			fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
+		}
 	}
 
 	return nil

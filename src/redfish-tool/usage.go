@@ -39,7 +39,11 @@ func ShowUsage() {
 		"\n"+
 		"get-user\n"+
 		"  -name=<name>\n"+
-		"       Get detailed information for user <name>\n"+
+		"       Get detailed information for user <name> (*)\n"+
+		"  -id=<id>\n"+
+		"       Get detailed information for user <id>(*)\n"+
+		"\n"+
+		"  (*) -name and -id are mutually exclusive\n"+
 		"\n"+
 		"get-all-roles\n"+
 		"\n"+

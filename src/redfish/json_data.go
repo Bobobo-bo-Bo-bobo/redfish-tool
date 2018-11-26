@@ -50,7 +50,7 @@ type SystemData struct {
 	BIOSVersion        *string `json:"BiosVersion"`
 	BIOS               *OData  `json:"Bios"`
 	// Actions
-    SelfEndpoint    *string
+	SelfEndpoint *string
 }
 
 type AccountService struct {
@@ -67,7 +67,7 @@ type AccountData struct {
 	Enabled  *bool   `json:"Enabled"`
 	Locked   *bool   `json:"Locked"`
 
-    SelfEndpoint    *string
+	SelfEndpoint *string
 }
 
 type RoleData struct {
@@ -77,5 +77,5 @@ type RoleData struct {
 	Description        *string  `json:"Description"`
 	AssignedPrivileges []string `json:"AssignedPrivileges"`
 	//    OemPrivileges   []string    `json:"OemPrivileges"`
-    SelfEndpoint    *string
+	SelfEndpoint *string
 }

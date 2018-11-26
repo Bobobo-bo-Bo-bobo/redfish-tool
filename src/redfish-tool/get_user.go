@@ -10,16 +10,24 @@ import (
 )
 
 func GetUser(r redfish.Redfish, args []string) error {
+	var acc *redfish.AccountData
+	var found bool
+	var amap map[string]*redfish.AccountData
 	argParse := flag.NewFlagSet("get-user", flag.ExitOnError)
 
-	var name = argParse.String("name", "", "Get detailed information for user")
+	var name = argParse.String("name", "", "Get detailed information for user identified by ID")
+	var id = argParse.String("id", "", "Get detailed information for user identified by ID")
 
 	argParse.Parse(args)
 
 	fmt.Println(r.Hostname)
 
-	if *name == "" {
-		return errors.New("ERROR: Required option -name not found")
+	if *name != "" && *id != "" {
+		return errors.New("ERROR: Options -name and -id are mutually exclusive")
+	}
+
+	if *name == "" && *id == "" {
+		return errors.New("ERROR: Required options -name or -id not found")
 	}
 
 	// Initialize session
@@ -37,15 +45,30 @@ func GetUser(r redfish.Redfish, args []string) error {
 	defer r.Logout()
 
 	// get all account endpoints
-	amap, err := r.MapAccountNames()
+	if *id != "" {
+		amap, err = r.MapAccountsById()
+	} else {
+		amap, err = r.MapAccountsByName()
+	}
+
 	if err != nil {
 		return err
 	}
 
-	acc, found := amap[*name]
+	if *id != "" {
+		acc, found = amap[*id]
+	} else {
+		acc, found = amap[*name]
+	}
+
 	if found {
 		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		fmt.Println(" " + *acc.UserName)
+		if *id != "" {
+			fmt.Println(" " + *acc.Id)
+		} else {
+			fmt.Println(" " + *acc.UserName)
+		}
+
 		if acc.Id != nil && *acc.Id != "" {
 			fmt.Println("  Id: " + *acc.Id)
 		}
@@ -80,11 +103,11 @@ func GetUser(r redfish.Redfish, args []string) error {
 			} else {
 				fmt.Println("  Locked: false")
 			}
-        }
+		}
 
-        if acc.SelfEndpoint != nil {
-            fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
-        }
+		if acc.SelfEndpoint != nil {
+			fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
+		}
 
 	} else {
 		fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *name, r.Hostname)
