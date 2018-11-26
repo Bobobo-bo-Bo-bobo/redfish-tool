@@ -193,5 +193,58 @@ func (r *Redfish) GetRoleData(roleEndpoint string) (*RoleData, error) {
 		return nil, err
 	}
 
+	result.SelfEndpoint = &roleEndpoint
 	return &result, nil
+}
+
+// map roles by name
+func (r *Redfish) MapRolesByName() (map[string]*RoleData, error) {
+	var result = make(map[string]*RoleData)
+
+	rl, err := r.GetRoles()
+	if err != nil {
+		return result, err
+	}
+
+	for _, ro := range rl {
+		rl, err := r.GetRoleData(ro)
+		if err != nil {
+			return result, err
+		}
+
+		// should NEVER happen
+		if rl.Name == nil {
+			return result, errors.New("ERROR: No Name found or Name is null")
+		}
+
+		result[*rl.Name] = rl
+	}
+
+	return result, nil
+}
+
+// map roles by ID
+func (r *Redfish) MapRolesById() (map[string]*RoleData, error) {
+	var result = make(map[string]*RoleData)
+
+	rl, err := r.GetRoles()
+	if err != nil {
+		return result, err
+	}
+
+	for _, ro := range rl {
+		r, err := r.GetRoleData(ro)
+		if err != nil {
+			return result, err
+		}
+
+		// should NEVER happen
+		if r.Id == nil {
+			return result, errors.New("ERROR: No Id found or Id is null")
+		}
+
+		result[*r.Id] = r
+	}
+
+	return result, nil
 }

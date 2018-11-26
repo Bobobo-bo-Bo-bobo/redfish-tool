@@ -19,6 +19,8 @@ type BaseRedfish interface {
 	MapAccountsById() (map[string]*AccountData, error)
 	GetRoles() ([]string, error)
 	GetRoleData(string) (*AccountData, error)
+	MapRolesByName() (map[string]*RoleData, error)
+	MapRolesById() (map[string]*RoleData, error)
 }
 
 type Redfish struct {

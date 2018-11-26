@@ -88,6 +88,11 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			}
+		} else if command == "get-all-roles" {
+			err = GetAllRoles(rf)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
 		} else {
 			fmt.Fprintf(os.Stderr, "ERROR: Unknown command %s\n\n", command)
 			ShowUsage()
