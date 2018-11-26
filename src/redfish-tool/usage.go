@@ -14,7 +14,7 @@ func ShowUsage() {
 		"redfish-tool is distributed under the Terms of the GNU General\n"+
 		"Public License Version 3. (http://www.gnu.org/copyleft/gpl.html)\n"+
 		"\n"+
-		"Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-user=<user>] <command> [<cmd_options>] [<host> <host>]\n"+
+		"Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-user=<user>] <command> [<cmd_options>]\n"+
 		"\n"+
 		"Global options:\n"+
 		"\n"+
@@ -35,23 +35,23 @@ func ShowUsage() {
 		"\n"+
 		"Commands:\n"+
 		"\n"+
-		"get-all-users\n"+
+		"  get-all-users\n"+
 		"\n"+
-		"get-user\n"+
-		"  -name=<name>\n"+
-		"       Get detailed information for user <name> (*)\n"+
-		"  -id=<id>\n"+
-		"       Get detailed information for user <id>(*)\n"+
+		"  get-user\n"+
+		"    -name=<name>\n"+
+		"         Get detailed information for user <name> (*)\n"+
+		"    -id=<id>\n"+
+		"         Get detailed information for user <id> (*)\n"+
 		"\n"+
-		"  (*) -name and -id are mutually exclusive\n"+
+		"    (*) -name and -id are mutually exclusive\n"+
 		"\n"+
-		"get-all-roles\n"+
+		"  get-all-roles\n"+
 		"\n"+
-		"get-role\n"+
-		"  -id=<id>\n"+
-		"       Get detailed information for role <id>(**)\n"+
+		"  get-role\n"+
+		"    -id=<id>\n"+
+		"         Get detailed information for role <id> (**)\n"+
 		"\n"+
-		"  (**) Because role names are not unique, roles can only be listed by ID\n"+
+		"    (**) Because role names are not unique, roles can only be listed by ID\n"+
 		"\n"+
 		"\n", version)
 }
