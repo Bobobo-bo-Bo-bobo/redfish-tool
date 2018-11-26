@@ -201,12 +201,12 @@ func (r *Redfish) GetRoleData(roleEndpoint string) (*RoleData, error) {
 func (r *Redfish) MapRolesByName() (map[string]*RoleData, error) {
 	var result = make(map[string]*RoleData)
 
-	rl, err := r.GetRoles()
+	rll, err := r.GetRoles()
 	if err != nil {
 		return result, err
 	}
 
-	for _, ro := range rl {
+	for _, ro := range rll {
 		rl, err := r.GetRoleData(ro)
 		if err != nil {
 			return result, err
@@ -227,12 +227,12 @@ func (r *Redfish) MapRolesByName() (map[string]*RoleData, error) {
 func (r *Redfish) MapRolesById() (map[string]*RoleData, error) {
 	var result = make(map[string]*RoleData)
 
-	rl, err := r.GetRoles()
+	rll, err := r.GetRoles()
 	if err != nil {
 		return result, err
 	}
 
-	for _, ro := range rl {
+	for _, ro := range rll {
 		r, err := r.GetRoleData(ro)
 		if err != nil {
 			return result, err
