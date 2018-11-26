@@ -22,7 +22,7 @@ func GetAllRoles(r redfish.Redfish) error {
 
 	defer r.Logout()
 
-    // get all role endpoints - Note: role names are _NOT_ unique but IDs are!
+	// get all role endpoints - Note: role names are _NOT_ unique but IDs are!
 	rmap, err := r.MapRolesById()
 	if err != nil {
 		return err
@@ -47,6 +47,13 @@ func GetAllRoles(r redfish.Redfish) error {
 				fmt.Println("  IsPredefined: true")
 			} else {
 				fmt.Println("  IsPredefined: false")
+			}
+		}
+
+		if len(rle.AssignedPrivileges) != 0 {
+			fmt.Println("  Assigned privieleges")
+			for _, p := range rle.AssignedPrivileges {
+				fmt.Println("   " + p)
 			}
 		}
 
