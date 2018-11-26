@@ -48,6 +48,10 @@ func ShowUsage() {
 		"get-all-roles\n"+
 		"\n"+
 		"get-role\n"+
+		"  -id=<id>\n"+
+		"       Get detailed information for role <id>(**)\n"+
+		"\n"+
+		"  (**) Because role names are not unique, roles can only be listed by ID\n"+
 		"\n"+
 		"\n", version)
 }
