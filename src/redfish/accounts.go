@@ -191,7 +191,7 @@ func (r *Redfish) GetAccountData(accountEndpoint string) (*AccountData, error) {
 	if err != nil {
 		return nil, err
 	}
-
+    result.SelfEndpoint = &accountEndpoint
 	return &result, nil
 }
 

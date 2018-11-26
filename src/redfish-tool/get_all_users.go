@@ -68,6 +68,10 @@ func GetAllUsers(r redfish.Redfish) error {
 				fmt.Println("  Locked: false")
 			}
 		}
+
+        if acc.SelfEndpoint != nil {
+            fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
+        }
 	}
 
 	return nil

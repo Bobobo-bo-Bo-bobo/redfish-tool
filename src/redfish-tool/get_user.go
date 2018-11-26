@@ -80,7 +80,12 @@ func GetUser(r redfish.Redfish, args []string) error {
 			} else {
 				fmt.Println("  Locked: false")
 			}
-		}
+        }
+
+        if acc.SelfEndpoint != nil {
+            fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
+        }
+
 	} else {
 		fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *name, r.Hostname)
 	}
