@@ -14,11 +14,25 @@ func GetUser(r redfish.Redfish, args []string) error {
 
 	var name = argParse.String("name", "", "Get detailed information for user")
 
-    argParse.Parse(args)
+	argParse.Parse(args)
 
 	if *name == "" {
 		return errors.New("ERROR: Required option -name not found")
 	}
+
+	// Initialize session
+	err := r.Initialise()
+	if err != nil {
+		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+	}
+
+	// Login
+	err = r.Login()
+	if err != nil {
+		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+	}
+
+	defer r.Logout()
 
 	// get all account endpoints
 	amap, err := r.MapAccountNames()
