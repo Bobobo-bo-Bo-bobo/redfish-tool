@@ -194,3 +194,28 @@ func (r *Redfish) GetAccountData(accountEndpoint string) (*AccountData, error) {
 
 	return &result, nil
 }
+
+// map username -> user data
+func (r *Redfish) MapAccountNames() (map[string]*AccountData, error) {
+	var result = make(map[string]*AccountData)
+
+	al, err := r.GetAccounts()
+	if err != nil {
+		return result, err
+	}
+
+	for _, acc := range al {
+		a, err := r.GetAccountData(acc)
+		if err != nil {
+			return result, err
+		}
+
+		// should NEVER happen
+		if a.UserName == nil {
+			return result, errors.New("BUG: No UserName found or UserName is null")
+		}
+		result[*a.UserName] = a
+	}
+
+	return result, nil
+}

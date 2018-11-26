@@ -1,12 +1,25 @@
 package main
 
 import (
+	"errors"
+	"flag"
 	"fmt"
+	"os"
 
 	"redfish"
 )
 
-func GetAllUsers(r redfish.Redfish) error {
+func GetUser(r redfish.Redfish, args []string) error {
+	argParse := flag.NewFlagSet("get-user", flag.ExitOnError)
+
+	var name = argParse.String("name", "", "Get detailed information for user")
+
+    argParse.Parse(args)
+
+	if *name == "" {
+		return errors.New("ERROR: Required option -name not found")
+	}
+
 	// get all account endpoints
 	amap, err := r.MapAccountNames()
 	if err != nil {
@@ -14,11 +27,10 @@ func GetAllUsers(r redfish.Redfish) error {
 	}
 
 	fmt.Println(r.Hostname)
-	// loop over all endpoints
-	for aname, acc := range amap {
-
+	acc, found := amap[*name]
+	if found {
 		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		fmt.Println(" " + aname)
+		fmt.Println(" " + *acc.UserName)
 		if acc.Id != nil && *acc.Id != "" {
 			fmt.Println("  Id: " + *acc.Id)
 		}
@@ -54,7 +66,9 @@ func GetAllUsers(r redfish.Redfish) error {
 				fmt.Println("  Locked: false")
 			}
 		}
+	} else {
+		fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *name, r.Hostname)
 	}
 
-	return err
+	return nil
 }

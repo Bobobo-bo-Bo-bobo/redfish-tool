@@ -38,6 +38,8 @@ func ShowUsage() {
 		"get-all-users\n"+
 		"\n"+
 		"get-user\n"+
+		"  -name=<name>\n"+
+		"       Get detailed information for user <name>\n"+
 		"\n"+
 		"get-all-roles\n"+
 		"\n"+

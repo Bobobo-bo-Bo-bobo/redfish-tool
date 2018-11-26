@@ -15,6 +15,7 @@ type BaseRedfish interface {
 	GetSystemData(string) (*SystemData, error)
 	GetAccounts() ([]string, error)
 	GetAccountData(string) (*AccountData, error)
+	MapAccountNames() (map[string]*AccountData, error)
 	GetRoles() ([]string, error)
 	GetRoleData(string) (*AccountData, error)
 }

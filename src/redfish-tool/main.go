@@ -98,7 +98,16 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s", err.Error())
 			}
-		} // XXX: ...
+		} else if command == "get-user" {
+			err = GetUser(rf, trailing[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s", err.Error())
+			}
+		} else {
+			fmt.Fprintf(os.Stderr, "ERROR: Unknown command %s\n\n", command)
+			ShowUsage()
+			os.Exit(1)
+		}
 
 		// Logout
 		err = rf.Logout()
