@@ -16,6 +16,8 @@ func GetUser(r redfish.Redfish, args []string) error {
 
 	argParse.Parse(args)
 
+	fmt.Println(r.Hostname)
+
 	if *name == "" {
 		return errors.New("ERROR: Required option -name not found")
 	}
@@ -40,7 +42,6 @@ func GetUser(r redfish.Redfish, args []string) error {
 		return err
 	}
 
-	fmt.Println(r.Hostname)
 	acc, found := amap[*name]
 	if found {
 		// XXX: Allow for different output formats like JSON, YAML, ... ?
