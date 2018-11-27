@@ -110,7 +110,11 @@ func GetUser(r redfish.Redfish, args []string) error {
 		}
 
 	} else {
-		fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *name, r.Hostname)
+		if *id != "" {
+			fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *id, r.Hostname)
+		} else {
+			fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *name, r.Hostname)
+		}
 	}
 
 	return nil

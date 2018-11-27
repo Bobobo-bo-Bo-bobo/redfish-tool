@@ -98,6 +98,16 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			}
+		} else if command == "get-all-managers" {
+			err = GetAllManagers(rf)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
+		} else if command == "get-manager" {
+			err = GetManager(rf, trailing[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
 		} else {
 			fmt.Fprintf(os.Stderr, "ERROR: Unknown command %s\n\n", command)
 			ShowUsage()

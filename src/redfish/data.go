@@ -28,8 +28,8 @@ type sessionServiceEndpoint struct {
 }
 
 type Status struct {
-	State  string `json:"State"`
-	Health string `json:"Health"`
+	State  *string `json:"State"`
+	Health *string `json:"Health"`
 }
 
 type SystemProcessorSummary struct {
