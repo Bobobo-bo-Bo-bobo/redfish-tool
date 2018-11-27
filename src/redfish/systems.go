@@ -151,3 +151,56 @@ func (r *Redfish) GetSystemData(systemEndpoint string) (*SystemData, error) {
 	result.SelfEndpoint = &systemEndpoint
 	return &result, nil
 }
+
+// Map systems by ID
+func (r *Redfish) MapSystemsById() (map[string]*SystemData, error) {
+    var result = make(map[string]*SystemData)
+
+    sysl, err := r.GetSystems()
+    if err != nil {
+        return result, nil
+    }
+
+    for _, sys := range sysl {
+        s, err := r.GetSystemData(sys)
+        if err != nil {
+            return result, err
+        }
+
+        // should NEVER happen
+        if s.Id == nil {
+            return result, errors.New(fmt.Sprintf("BUG: No Id found for System at %s", sys))
+        }
+
+        result[*s.Id] = s
+    }
+
+    return result, nil
+}
+
+// Map systems by UUID
+func (r *Redfish) MapSystemsByUuid() (map[string]*SystemData, error) {
+    var result = make(map[string]*SystemData)
+
+    sysl, err := r.GetSystems()
+    if err != nil {
+        return result, nil
+    }
+
+    for _, sys := range sysl {
+        s, err := r.GetSystemData(sys)
+        if err != nil {
+            return result, err
+        }
+
+        // should NEVER happen
+        if s.UUID == nil {
+            return result, errors.New(fmt.Sprintf("BUG: No UUID found for System at %s", sys))
+        }
+
+        result[*s.UUID] = s
+    }
+
+    return result, nil
+}
+
