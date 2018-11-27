@@ -205,6 +205,32 @@ func (r *Redfish) MapSystemsByUuid() (map[string]*SystemData, error) {
 	return result, nil
 }
 
+// Map systems by serial number
+func (r *Redfish) MapSystemsBySerialNumber() (map[string]*SystemData, error) {
+	var result = make(map[string]*SystemData)
+
+	sysl, err := r.GetSystems()
+	if err != nil {
+		return result, nil
+	}
+
+	for _, sys := range sysl {
+		s, err := r.GetSystemData(sys)
+		if err != nil {
+			return result, err
+		}
+
+		// should NEVER happen
+		if s.SerialNumber == nil {
+			return result, errors.New(fmt.Sprintf("BUG: No SerialNumber found for System at %s", sys))
+		}
+
+		result[*s.SerialNumber] = s
+	}
+
+	return result, nil
+}
+
 // get vendor specific "flavor"
 func (r *Redfish) GetVendorFlavor() error {
 	// get vendor "flavor" for vendor specific implementation details

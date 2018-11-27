@@ -1,6 +1,9 @@
 package redfish
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type OData struct {
 	Id           *string `json:"@odata.id"`
@@ -83,15 +86,14 @@ type RoleData struct {
 }
 
 type ManagerData struct {
-	Id              *string `json:"Id"`
-	Name            *string `json:"Name"`
-	ManagerType     *string `json:"ManagerType"`
-	UUID            *string `json:"UUID"`
-	Status          Status  `json:"Status"`
-	FirmwareVersion *string `json:"FirmwareVersion"`
-
+	Id              *string         `json:"Id"`
+	Name            *string         `json:"Name"`
+	ManagerType     *string         `json:"ManagerType"`
+	UUID            *string         `json:"UUID"`
+	Status          Status          `json:"Status"`
+	FirmwareVersion *string         `json:"FirmwareVersion"`
+	Oem             json.RawMessage `json:"Oem"`
 	/* futher data
-	   Oem
 	   VirtualMedia
 	   SerialConsole
 	   NetworkProtocol
@@ -102,6 +104,63 @@ type ManagerData struct {
 	*/
 
 	SelfEndpoint *string
+}
+
+// HP/HPE: Oem data for Manager endpoint
+type OemHpLinks struct {
+	Href *string `json:"href"`
+}
+
+type ManagerDataOemHpLicense struct {
+	Key    *string `json:"LicenseKey"`
+	String *string `json:"LicenseString"`
+	Type   *string `json:"LicenseType"`
+}
+
+type ManagerDataOemHpFederationConfig struct {
+	IPv6MulticastScope            *string `json:"IPv6MulticastScope"`
+	MulticastAnnouncementInterval *int64  `json:"MulticastAnnouncementInterval"`
+	MulticastDiscovery            *string `json:"MulticastDiscovery"`
+	MulticastTimeToLive           *int64  `json:"MulticastTimeToLive"`
+	ILOFederationManagement       *string `json:"iLOFederationManagement"`
+}
+
+type ManagerDataOemHpFirmwareData struct {
+	Date         *string `json:"Date"`
+	DebugBuild   *bool   `json:"DebugBuild"`
+	MajorVersion *uint64 `json:"MajorVersion"`
+	MinorVersion *uint64 `json:"MinorVersion"`
+	Time         *string `json:"Time"`
+	Version      *string `json:"Version"`
+}
+
+type ManagerDataOemHpFirmware struct {
+	Current ManagerDataOemHpFirmwareData `json:"Current"`
+}
+
+type ManagerDataOemHpLinks struct {
+	ActiveHealthSystem   OemHpLinks `json:"ActiveHealthSystem"`
+	DateTimeService      OemHpLinks `json:"DateTimeService"`
+	EmbeddedMediaService OemHpLinks `json:"EmbeddedMediaService"`
+	FederationDispatch   OemHpLinks `json:"FederationDispatch"`
+	FederationGroups     OemHpLinks `json:"FederationGroups"`
+	FederationPeers      OemHpLinks `json:"FederationPeers"`
+	LicenseService       OemHpLinks `json:"LicenseService"`
+	SecurityService      OemHpLinks `json:"SecurityService"`
+	UpdateService        OemHpLinks `json:"UpdateService"`
+	VSPLogLocation       OemHpLinks `json:"VSPLogLocation"`
+}
+
+type ManagerDataOemHp struct {
+	FederationConfig ManagerDataOemHpFederationConfig `json:"FederationConfig"`
+	Firmware         ManagerDataOemHpFirmware         `json:"Firmware"`
+	License          ManagerDataOemHpLicense          `json:"License"`
+	Type             *string                          `json:"Type"`
+	Links            ManagerDataOemHpLinks            `json:"links"`
+}
+
+type _managerDataOemHp struct {
+	Hp ManagerDataOemHp `json:"Hp"`
 }
 
 const (
@@ -126,6 +185,7 @@ type BaseRedfish interface {
 	GetSystemData(string) (*SystemData, error)
 	MapSystensById() (map[string]*SystemData, error)
 	MapSystemsByUuid() (map[string]*SystemData, error)
+	MapSystemsBySerialNumber() (map[string]*SystemData, error)
 	GetAccounts() ([]string, error)
 	GetAccountData(string) (*AccountData, error)
 	MapAccountsByName() (map[string]*AccountData, error)
