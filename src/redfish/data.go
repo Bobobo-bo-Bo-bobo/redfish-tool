@@ -82,6 +82,28 @@ type RoleData struct {
 	SelfEndpoint *string
 }
 
+type ManagerData struct {
+	Id              *string `json:"Id"`
+	Name            *string `json:"Name"`
+	ManagerType     *string `json:"ManagerType"`
+	UUID            *string `json:"UUID"`
+	Status          Status  `json:"Status"`
+	FirmwareVersion *string `json:"FirmwareVersion"`
+
+	/* futher data
+	   Oem
+	   VirtualMedia
+	   SerialConsole
+	   NetworkProtocol
+	   GraphicalConsole
+	   FirmwareVersion
+	   EthernetInterfaces
+	   Actions
+	*/
+
+	SelfEndpoint *string
+}
+
 const (
 	REDFISH_GENERAL uint = iota
 	REDFISH_HP

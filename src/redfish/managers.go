@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
-//get array of systems and their endpoints
-func (r *Redfish) GetSystems() ([]string, error) {
+//get array of managers and their endpoints
+func (r *Redfish) GetManagers() ([]string, error) {
 	var url string
-	var systems OData
+	var mgrs OData
 	var transp *http.Transport
 	var result = make([]string, 0)
 
@@ -36,10 +35,11 @@ func (r *Redfish) GetSystems() ([]string, error) {
 		Timeout:   r.Timeout,
 		Transport: transp,
 	}
+
 	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.Systems)
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.Managers)
 	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, r.Systems)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, r.Managers)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -58,36 +58,36 @@ func (r *Redfish) GetSystems() ([]string, error) {
 	}
 	response.Close = true
 
-	defer response.Body.Close()
-
 	// store unparsed content
 	raw, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		response.Body.Close()
 		return result, err
 	}
+	response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 
-	err = json.Unmarshal(raw, &systems)
+	err = json.Unmarshal(raw, &mgrs)
 	if err != nil {
 		return result, err
 	}
 
-	if len(systems.Members) == 0 {
-		return result, errors.New("BUG: Array of system endpoints is empty")
+	if len(mgrs.Members) == 0 {
+		return result, errors.New(fmt.Sprintf("BUG: Missing or empty Members attribute in Managers"))
 	}
 
-	for _, endpoint := range systems.Members {
-		result = append(result, *endpoint.Id)
+	for _, m := range mgrs.Members {
+		result = append(result, *m.Id)
 	}
 	return result, nil
 }
 
-// get system data for a particular system
-func (r *Redfish) GetSystemData(systemEndpoint string) (*SystemData, error) {
-	var result SystemData
+// get manager data for a particular account
+func (r *Redfish) GetManagerData(managerEndpoint string) (*ManagerData, error) {
+	var result ManagerData
 	var url string
 	var transp *http.Transport
 
@@ -111,9 +111,9 @@ func (r *Redfish) GetSystemData(systemEndpoint string) (*SystemData, error) {
 		Transport: transp,
 	}
 	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, systemEndpoint)
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, managerEndpoint)
 	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, systemEndpoint)
+		url = fmt.Sprintf("https://%s%s", r.Hostname, managerEndpoint)
 	}
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -148,86 +148,56 @@ func (r *Redfish) GetSystemData(systemEndpoint string) (*SystemData, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	result.SelfEndpoint = &systemEndpoint
+	result.SelfEndpoint = &managerEndpoint
 	return &result, nil
 }
 
-// Map systems by ID
-func (r *Redfish) MapSystemsById() (map[string]*SystemData, error) {
-	var result = make(map[string]*SystemData)
+// map ID -> manager data
+func (r *Redfish) MapManagersById() (map[string]*ManagerData, error) {
+	var result = make(map[string]*ManagerData)
 
-	sysl, err := r.GetSystems()
+	ml, err := r.GetManagers()
 	if err != nil {
-		return result, nil
+		return result, err
 	}
 
-	for _, sys := range sysl {
-		s, err := r.GetSystemData(sys)
+	for _, mgr := range ml {
+		m, err := r.GetManagerData(mgr)
 		if err != nil {
 			return result, err
 		}
 
 		// should NEVER happen
-		if s.Id == nil {
-			return result, errors.New(fmt.Sprintf("BUG: No Id found for System at %s", sys))
+		if m.Id == nil {
+			return result, errors.New(fmt.Sprintf("BUG: No Id found or Id is null in JSON data from %s", mgr))
 		}
-
-		result[*s.Id] = s
+		result[*m.Id] = m
 	}
 
 	return result, nil
 }
 
-// Map systems by UUID
-func (r *Redfish) MapSystemsByUuid() (map[string]*SystemData, error) {
-	var result = make(map[string]*SystemData)
+// map UUID -> manager data
+func (r *Redfish) MapManagersByUuid() (map[string]*ManagerData, error) {
+	var result = make(map[string]*ManagerData)
 
-	sysl, err := r.GetSystems()
+	ml, err := r.GetManagers()
 	if err != nil {
-		return result, nil
+		return result, err
 	}
 
-	for _, sys := range sysl {
-		s, err := r.GetSystemData(sys)
+	for _, mgr := range ml {
+		m, err := r.GetManagerData(mgr)
 		if err != nil {
 			return result, err
 		}
 
 		// should NEVER happen
-		if s.UUID == nil {
-			return result, errors.New(fmt.Sprintf("BUG: No UUID found for System at %s", sys))
+		if m.UUID == nil {
+			return result, errors.New(fmt.Sprintf("BUG: No UUID found or UUID is null in JSON data from %s", mgr))
 		}
-
-		result[*s.UUID] = s
+		result[*m.UUID] = m
 	}
 
 	return result, nil
-}
-
-// get vendor specific "flavor"
-func (r *Redfish) GetVendorFlavor() error {
-	// get vendor "flavor" for vendor specific implementation details
-	_sys, err := r.GetSystems()
-	if err != nil {
-		return err
-	}
-	// assuming every system has the same vendor, pick the first one to determine vendor flavor
-	_sys0, err := r.GetSystemData(_sys[0])
-	if _sys0.Manufacturer != nil {
-		_manufacturer := strings.TrimSpace(strings.ToLower(*_sys0.Manufacturer))
-		if _manufacturer == "hp" || _manufacturer == "hpe" {
-			r.Flavor = REDFISH_HP
-		} else if _manufacturer == "huawei" {
-			r.Flavor = REDFISH_HUAWEI
-		} else if _manufacturer == "inspur" {
-			r.Flavor = REDFISH_INSPUR
-		} else if _manufacturer == "supermicro" {
-			r.Flavor = REDFISH_SUPERMICRO
-		} else {
-			r.Flavor = REDFISH_GENERAL
-		}
-	}
-
-	return nil
 }
