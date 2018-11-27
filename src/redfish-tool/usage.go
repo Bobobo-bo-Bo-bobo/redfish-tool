@@ -39,9 +39,9 @@ func ShowUsage() {
 		"\n"+
 		"  get-user\n"+
 		"    -name=<name>\n"+
-		"         Get detailed information for user <name> (*)\n"+
+		"         Get detailed information for user identified by name (*)\n"+
 		"    -id=<id>\n"+
-		"         Get detailed information for user <id> (*)\n"+
+		"         Get detailed information for user identified by ID (*)\n"+
 		"\n"+
 		"    (*) -name and -id are mutually exclusive\n"+
 		"\n"+
@@ -49,9 +49,29 @@ func ShowUsage() {
 		"\n"+
 		"  get-role\n"+
 		"    -id=<id>\n"+
-		"         Get detailed information for role <id> (**)\n"+
+		"         Get detailed information for role identified by ID (**)\n"+
 		"\n"+
 		"    (**) Because role names are not unique, roles can only be listed by ID\n"+
+		"\n"+
+		"  get-all-managers\n"+
+		"\n"+
+		"  get-manager\n"+
+		"    -uuid=<uuid>\n"+
+		"         Get detailed information for user identified by UUID (*)\n"+
+		"    -id=<id>\n"+
+		"         Get detailed information for user identified by ID (*)\n"+
+		"\n"+
+		"    (*) -uuid and -id are mutually exclusive\n"+
+		"\n"+
+		"  get-all-systems\n"+
+		"\n"+
+		"  get-system\n"+
+		"    -uuid=<uuid>\n"+
+		"         Get detailed information for system identified by UUID (*)\n"+
+		"    -id=<id>\n"+
+		"         Get detailed information for system identified by ID (*)\n"+
+		"\n"+
+		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+
 		"\n", version)
 }

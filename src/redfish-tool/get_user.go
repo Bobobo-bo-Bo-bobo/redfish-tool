@@ -15,7 +15,7 @@ func GetUser(r redfish.Redfish, args []string) error {
 	var amap map[string]*redfish.AccountData
 	argParse := flag.NewFlagSet("get-user", flag.ExitOnError)
 
-	var name = argParse.String("name", "", "Get detailed information for user identified by ID")
+	var name = argParse.String("name", "", "Get detailed information for user identified by name")
 	var id = argParse.String("id", "", "Get detailed information for user identified by ID")
 
 	argParse.Parse(args)

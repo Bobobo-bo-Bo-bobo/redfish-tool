@@ -108,6 +108,16 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			}
+		} else if command == "get-all-systems" {
+			err = GetAllSystems(rf)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
+		} else if command == "get-system" {
+			err = GetSystem(rf, trailing[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
 		} else {
 			fmt.Fprintf(os.Stderr, "ERROR: Unknown command %s\n\n", command)
 			ShowUsage()
