@@ -88,5 +88,10 @@ func ShowUsage() {
 		"       CSR - common name, hostname will be used if no CN is set\n"+
 		"\n"+
 		"  fetch-csr\n"+
+		"\n"+
+		"  import-cert\n"+
+		"    -certificate=<cert>\n"+
+		"       Certificate file in PEM format to import\n"+
+		"\n"+
 		"\n", version)
 }
