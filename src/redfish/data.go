@@ -107,7 +107,7 @@ type ManagerData struct {
 	SelfEndpoint *string
 }
 
-// HP/HPE: Oem data for Manager endpoint
+// HP/HPE: Oem data for Manager endpoint and SecurityService endpoint
 type OemHpLinks struct {
 	Href *string `json:"href"`
 }
@@ -152,7 +152,7 @@ type ManagerDataOemHpLinks struct {
 	VSPLogLocation       OemHpLinks `json:"VSPLogLocation"`
 }
 
-type ManagerDataOemHp struct {
+type _managerDataOemHp struct {
 	FederationConfig ManagerDataOemHpFederationConfig `json:"FederationConfig"`
 	Firmware         ManagerDataOemHpFirmware         `json:"Firmware"`
 	License          ManagerDataOemHpLicense          `json:"License"`
@@ -160,8 +160,30 @@ type ManagerDataOemHp struct {
 	Links            ManagerDataOemHpLinks            `json:"links"`
 }
 
-type _managerDataOemHp struct {
-	Hp ManagerDataOemHp `json:"Hp"`
+type ManagerDataOemHp struct {
+	Hp _managerDataOemHp `json:"Hp"`
+}
+
+type SecurityServiceDataOemHpLinks struct {
+	ESKM      OemHpLinks `json:"ESKM"`
+	HttpsCert OemHpLinks `json:"HttpsCert"`
+	SSO       OemHpLinks `json:"SSO"`
+}
+
+type SecurityServiceDataOemHp struct {
+	Id    *string                       `json:"Id"`
+	Type  *string                       `json:"Type"`
+	Links SecurityServiceDataOemHpLinks `json:"links"`
+}
+
+// data for CSR subject
+type CSRData struct {
+	C  string // Country
+	S  string // State or province
+	L  string // Locality or city
+	O  string // Organisation
+	OU string // Organisational unit
+	CN string // Common name
 }
 
 const (
@@ -195,6 +217,10 @@ type BaseRedfish interface {
 	GetRoleData(string) (*AccountData, error)
 	MapRolesByName() (map[string]*RoleData, error)
 	MapRolesById() (map[string]*RoleData, error)
+	GenCSR(CSRData) error
+
+	getCSRTarget_HP(*ManagerData) (string, error)
+	getCSRTarget_Huawei(*ManagerData) (string, error)
 }
 
 type Redfish struct {
