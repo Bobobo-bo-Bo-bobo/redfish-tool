@@ -139,17 +139,22 @@ type ManagerDataOemHpFirmware struct {
 	Current ManagerDataOemHpFirmwareData `json:"Current"`
 }
 
+// NOTE: The result for HP/HPE are different depending if the HTTP header
+// OData-Version is set or not. If OData-Version is _NOT_ set data are returned in
+// .Oem.Hp.links with endpoints in "href". If OData-Version is set
+// data are returned in .Oem.Hp.Links (note different case!) and endpoints are
+// defined as @odata.id. We always set "OData-Version: 4.0"
 type ManagerDataOemHpLinks struct {
-	ActiveHealthSystem   OemHpLinks `json:"ActiveHealthSystem"`
-	DateTimeService      OemHpLinks `json:"DateTimeService"`
-	EmbeddedMediaService OemHpLinks `json:"EmbeddedMediaService"`
-	FederationDispatch   OemHpLinks `json:"FederationDispatch"`
-	FederationGroups     OemHpLinks `json:"FederationGroups"`
-	FederationPeers      OemHpLinks `json:"FederationPeers"`
-	LicenseService       OemHpLinks `json:"LicenseService"`
-	SecurityService      OemHpLinks `json:"SecurityService"`
-	UpdateService        OemHpLinks `json:"UpdateService"`
-	VSPLogLocation       OemHpLinks `json:"VSPLogLocation"`
+	ActiveHealthSystem   OData `json:"ActiveHealthSystem"`
+	DateTimeService      OData `json:"DateTimeService"`
+	EmbeddedMediaService OData `json:"EmbeddedMediaService"`
+	FederationDispatch   OData `json:"FederationDispatch"`
+	FederationGroups     OData `json:"FederationGroups"`
+	FederationPeers      OData `json:"FederationPeers"`
+	LicenseService       OData `json:"LicenseService"`
+	SecurityService      OData `json:"SecurityService"`
+	UpdateService        OData `json:"UpdateService"`
+	VSPLogLocation       OData `json:"VSPLogLocation"`
 }
 
 type _managerDataOemHp struct {

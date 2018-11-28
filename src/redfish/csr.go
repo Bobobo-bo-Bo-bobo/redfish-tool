@@ -24,8 +24,8 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	}
 
 	// get SecurityService endpoint from .Oem.Hp.links.SecurityService
-	if oemHp.Hp.Links.SecurityService.Href == nil {
-		return csrTarget, errors.New("BUG: .Hp.Links.SecurityService.Href not found or null")
+	if oemHp.Hp.Links.SecurityService.Id == nil {
+		return csrTarget, errors.New("BUG: .Hp.Links.SecurityService.Id not found or null")
 	} else {
 		secsvc = *oemHp.Hp.Links.SecurityService.Href
 	}
