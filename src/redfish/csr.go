@@ -89,11 +89,11 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 		return csrTarget, err
 	}
 
-	if oemSSvc.Links.HttpsCert.Href == nil {
-		return csrTarget, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Href not present or is null in data from %s", url))
+	if oemSSvc.Links.HttpsCert.Id == nil {
+		return csrTarget, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", url))
 	}
 
-	csrTarget = *oemSSvc.Links.HttpsCert.Href
+	csrTarget = *oemSSvc.Links.HttpsCert.Id
 	return csrTarget, nil
 }
 
