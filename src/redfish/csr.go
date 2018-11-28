@@ -17,8 +17,14 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	var url string
 	var transp *http.Transport
 
+	// set vendor flavor
+	err := r.GetVendorFlavor()
+	if err != nil {
+		return csrTarget, err
+	}
+
 	// parse Oem section from JSON
-	err := json.Unmarshal(mgr.Oem, &oemHp)
+	err = json.Unmarshal(mgr.Oem, &oemHp)
 	if err != nil {
 		return csrTarget, err
 	}
