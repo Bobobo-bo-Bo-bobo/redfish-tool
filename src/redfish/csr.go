@@ -18,7 +18,7 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	var transp *http.Transport
 
 	// parse Oem section from JSON
-    err := json.Unmarshal(mgr.Oem, &oemHp)
+	err := json.Unmarshal(mgr.Oem, &oemHp)
 	if err != nil {
 		return csrTarget, err
 	}
@@ -110,7 +110,7 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 	// set vendor flavor
 	err := r.GetVendorFlavor()
 	if err != nil {
-		return csrTarget, err
+		return err
 	}
 
 	if csr.C != "" {
@@ -142,7 +142,7 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 	csrstr = "{ " + csrstr + " } "
 
 	// get list of Manager endpoint
-	mgr_list, err = r.GetManagers()
+	mgr_list, err := r.GetManagers()
 	if err != nil {
 		return err
 	}
