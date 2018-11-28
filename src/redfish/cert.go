@@ -219,7 +219,9 @@ func (r *Redfish) ImportCertificate(cert string) error {
 
 	// escape new lines
 	rawcert := strings.Replace(cert, "\n", "\\n", -1)
-	request, err := http.NewRequest("POST", url, strings.NewReader(rawcert))
+	cert_payload := fmt.Sprintf("{ \"Certificate\": \"%s\" }", rawcert)
+
+	request, err := http.NewRequest("POST", url, strings.NewReader(cert_payload))
 	if err != nil {
 		return err
 	}
