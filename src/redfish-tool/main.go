@@ -118,6 +118,11 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			}
+		} else if command == "gen-csr" {
+			err = GenCSR(rf, trailing[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
 		} else {
 			fmt.Fprintf(os.Stderr, "ERROR: Unknown command %s\n\n", command)
 			ShowUsage()
