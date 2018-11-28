@@ -252,6 +252,7 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 
 	request.Header.Add("OData-Version", "4.0")
 	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("X-Auth-Token", *r.AuthToken)
 
 	request.Close = true
