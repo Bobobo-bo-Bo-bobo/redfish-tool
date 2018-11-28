@@ -162,6 +162,22 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 		return err
 	}
 
+	if csr.C == "" {
+		csr.C = "XX"
+	}
+	if csr.S == "" {
+		csr.S = "-"
+	}
+	if csr.L == "" {
+		csr.L = "-"
+	}
+	if csr.O == "" {
+		csr.O = "-"
+	}
+	if csr.OU == "" {
+		csr.OU = "-"
+	}
+
 	csrstr += fmt.Sprintf("\"Country\": \"%s\", ", csr.C)
 	csrstr += fmt.Sprintf("\"State\": \"%s\", ", csr.S)
 	csrstr += fmt.Sprintf("\"City\": \"%s\", ", csr.L)
