@@ -108,8 +108,8 @@ type ManagerData struct {
 }
 
 // HP/HPE: Oem data for Manager endpoint and SecurityService endpoint
-type OemHpLinks struct {
-	Href *string `json:"href"`
+type OemHpLinkTargets struct {
+	Target *string `json:"target"`
 }
 
 type ManagerDataOemHpLicense struct {
@@ -179,6 +179,26 @@ type SecurityServiceDataOemHp struct {
 	Id    *string                       `json:"Id"`
 	Type  *string                       `json:"Type"`
 	Links SecurityServiceDataOemHpLinks `json:"Links"`
+}
+
+type X509CertInfoOemHp struct {
+	Issuer         *string `json:"Issuer"`
+	SerialNumber   *string `json:"SerialNumber"`
+	Subject        *string `json:"Subject"`
+	ValidNotAfter  *string `json:"ValidNotAfter"`
+	ValidNotBefore *string `json:"ValidNotBefore"`
+}
+
+type HttpsCertActionsOemHp struct {
+	GenerateCSR                OemHpLinkTargets  `json:"#HpHttpsCert.GenerateCSR"`
+	ImportCertificate          OemHpLinkTargets  `json:"#HpHttpsCert.ImportCertificate"`
+	X509CertificateInformation X509CertInfoOemHp `json:"X509CertificateInformation"`
+}
+
+type HttpsCertDataOemHp struct {
+	CSR     *string               `json:"CertificateSigningRequest"`
+	Id      *string               `json:"Id"`
+	Actions HttpsCertActionsOemHp `json:"Actions"`
 }
 
 // data for CSR subject

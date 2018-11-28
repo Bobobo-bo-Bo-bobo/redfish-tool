@@ -16,6 +16,8 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	var oemSSvc SecurityServiceDataOemHp
 	var url string
 	var transp *http.Transport
+	var httpscertloc string
+	var httpscert HttpsCertDataOemHp
 
 	// parse Oem section from JSON
 	err := json.Unmarshal(mgr.Oem, &oemHp)
@@ -44,7 +46,6 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 		}
 	}
 
-	// get URL for Systems endpoint
 	client := &http.Client{
 		Timeout:   r.Timeout,
 		Transport: transp,
@@ -93,7 +94,52 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 		return csrTarget, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", url))
 	}
 
-	csrTarget = *oemSSvc.Links.HttpsCert.Id
+	httpscertloc = *oemSSvc.Links.HttpsCert.Id
+
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, httpscertloc)
+	} else {
+		url = fmt.Sprintf("https://%s%s", r.Hostname, httpscertloc)
+	}
+	request, err = http.NewRequest("GET", url, nil)
+	if err != nil {
+		return csrTarget, err
+	}
+
+	request.Header.Add("OData-Version", "4.0")
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
+
+	request.Close = true
+
+	response, err = client.Do(request)
+	if err != nil {
+		return csrTarget, err
+	}
+	response.Close = true
+
+	// store unparsed content
+	raw, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		response.Body.Close()
+		return csrTarget, err
+	}
+	response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+	}
+
+	err = json.Unmarshal(raw, &httpscert)
+	if err != nil {
+		return csrTarget, err
+	}
+
+	if httpscert.Actions.GenerateCSR.Target == nil {
+		return csrTarget, errors.New(fmt.Sprintf("BUG: .Actions.GenerateCSR.Target is not present or empty in JSON data from %s", url))
+	}
+
+	csrTarget = *httpscert.Actions.GenerateCSR.Target
 	return csrTarget, nil
 }
 
