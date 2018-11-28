@@ -21,8 +21,6 @@ func GetSystem(r redfish.Redfish, args []string) error {
 
 	argParse.Parse(args)
 
-	fmt.Println(r.Hostname)
-
 	if *uuid != "" && *id != "" {
 		return errors.New("ERROR: Options -uuid and -id are mutually exclusive")
 	}
