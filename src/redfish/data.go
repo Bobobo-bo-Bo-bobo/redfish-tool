@@ -157,7 +157,7 @@ type _managerDataOemHp struct {
 	Firmware         ManagerDataOemHpFirmware         `json:"Firmware"`
 	License          ManagerDataOemHpLicense          `json:"License"`
 	Type             *string                          `json:"Type"`
-	Links            ManagerDataOemHpLinks            `json:"links"`
+	Links            ManagerDataOemHpLinks            `json:"Links"`
 }
 
 type ManagerDataOemHp struct {
