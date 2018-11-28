@@ -243,9 +243,11 @@ type BaseRedfish interface {
 	MapRolesByName() (map[string]*RoleData, error)
 	MapRolesById() (map[string]*RoleData, error)
 	GenCSR(CSRData) error
+	FetchCSR() (string, error)
 
 	getCSRTarget_HP(*ManagerData) (string, error)
 	getCSRTarget_Huawei(*ManagerData) (string, error)
+	fetchCSR_HP(*ManagerData) (string, error)
 }
 
 type Redfish struct {

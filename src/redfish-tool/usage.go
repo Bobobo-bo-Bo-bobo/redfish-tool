@@ -87,5 +87,6 @@ func ShowUsage() {
 		"   -common-name=<cn>\n"+
 		"       CSR - common name, hostname will be used if no CN is set\n"+
 		"\n"+
+		"  fetch-csr\n"+
 		"\n", version)
 }
