@@ -17,14 +17,8 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	var url string
 	var transp *http.Transport
 
-	// set vendor flavor
-	err := r.GetVendorFlavor()
-	if err != nil {
-		return csrTarget, err
-	}
-
 	// parse Oem section from JSON
-	err = json.Unmarshal(mgr.Oem, &oemHp)
+    err := json.Unmarshal(mgr.Oem, &oemHp)
 	if err != nil {
 		return csrTarget, err
 	}
@@ -113,6 +107,12 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 	var csrstr string = ""
 	var gencsrtarget string = ""
 
+	// set vendor flavor
+	err := r.GetVendorFlavor()
+	if err != nil {
+		return csrTarget, err
+	}
+
 	if csr.C != "" {
 		csrstr += fmt.Sprintf("\"Country\": \"%s\", ", csr.C)
 	}
@@ -142,7 +142,7 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 	csrstr = "{ " + csrstr + " } "
 
 	// get list of Manager endpoint
-	mgr_list, err := r.GetManagers()
+	mgr_list, err = r.GetManagers()
 	if err != nil {
 		return err
 	}
