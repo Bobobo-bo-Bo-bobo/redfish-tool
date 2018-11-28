@@ -73,5 +73,19 @@ func ShowUsage() {
 		"\n"+
 		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+
+		"  gen-csr\n"+
+		"    -country=<c>\n"+
+		"       CSR - country\n"+
+		"    -state=<s>\n"+
+		"       CSR - state or province\n"+
+		"    -locality=<l>\n"+
+		"       CSR - locality or city\n"+
+		"   -organisation=<o>\n"+
+		"       CSR - organisation\n"+
+		"   -organisational-unit=<ou>\n"+
+		"       CSR - organisational unit\n"+
+		"   -common-name=<cn>\n"+
+		"       CSR - common name, hostname will be used if no CN is set\n"+
+		"\n"+
 		"\n", version)
 }

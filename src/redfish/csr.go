@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
@@ -152,6 +153,8 @@ func (r *Redfish) getCSRTarget_Huawei(mgr *ManagerData) (string, error) {
 func (r *Redfish) GenCSR(csr CSRData) error {
 	var csrstr string = ""
 	var gencsrtarget string = ""
+	var transp *http.Transport
+	var url string
 
 	// set vendor flavor
 	err := r.GetVendorFlavor()
@@ -216,6 +219,60 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 
 	if gencsrtarget == "" {
 		return errors.New("BUG: CSR generation target is not known")
+	}
+
+	if r.AuthToken == nil || *r.AuthToken == "" {
+		return errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
+
+	if r.InsecureSSL {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+	} else {
+		transp = &http.Transport{
+			TLSClientConfig: &tls.Config{},
+		}
+	}
+
+	// get URL for Systems endpoint
+	client := &http.Client{
+		Timeout:   r.Timeout,
+		Transport: transp,
+	}
+	if r.Port > 0 {
+		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, gencsrtarget)
+	} else {
+		url = fmt.Sprintf("https://%s%s", r.Hostname, gencsrtarget)
+	}
+	request, err := http.NewRequest("POST", url, strings.NewReader(csrstr))
+	if err != nil {
+		return err
+	}
+
+	request.Header.Add("OData-Version", "4.0")
+	request.Header.Add("Accept", "application/json")
+	request.Header.Add("X-Auth-Token", *r.AuthToken)
+
+	request.Close = true
+
+	response, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	response.Close = true
+
+	defer request.Body.Close()
+	defer response.Body.Close()
+
+	// XXX: do we need to look at the content returned by HTTP POST ?
+	_, err = ioutil.ReadAll(response.Body)
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return errors.New(fmt.Sprintf("ERROR: HTTP POST to %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
 	}
 
 	return nil
