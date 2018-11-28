@@ -170,15 +170,15 @@ type ManagerDataOemHp struct {
 }
 
 type SecurityServiceDataOemHpLinks struct {
-	ESKM      OemHpLinks `json:"ESKM"`
-	HttpsCert OemHpLinks `json:"HttpsCert"`
-	SSO       OemHpLinks `json:"SSO"`
+	ESKM      OData `json:"ESKM"`
+	HttpsCert OData `json:"HttpsCert"`
+	SSO       OData `json:"SSO"`
 }
 
 type SecurityServiceDataOemHp struct {
 	Id    *string                       `json:"Id"`
 	Type  *string                       `json:"Type"`
-	Links SecurityServiceDataOemHpLinks `json:"links"`
+	Links SecurityServiceDataOemHpLinks `json:"Links"`
 }
 
 // data for CSR subject
