@@ -72,6 +72,10 @@ func (r *Redfish) fetchCSR_HP(mgr *ManagerData) (string, error) {
 	}
 
 	if httpscert.CSR == nil {
+        // Note: We can't really distinguish between a running CSR generation or not.
+        // If no CSR generation has started and no certificate was imported the API reports "CertificateSigningRequest": null,
+        // whereas CertificateSigningRequest is not present when CSR generation is running but the JSON parser can't distinguish between both
+        // situations
 		return csr, errors.New(fmt.Sprintf("ERROR: No CertificateSigningRequest found. Either CSR generation hasn't been started or is still running"))
 	}
 
