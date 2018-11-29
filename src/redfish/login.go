@@ -16,7 +16,7 @@ func (r *Redfish) Login() error {
 		return errors.New(fmt.Sprintf("ERROR: Both Username and Password must be set"))
 	}
 
-    response, err := r.httpRequest(r.SessionService, "GET", nil, nil, true)
+	response, err := r.httpRequest(r.SessionService, "GET", nil, nil, true)
 	if err != nil {
 		return err
 	}
@@ -25,7 +25,7 @@ func (r *Redfish) Login() error {
 		return errors.New(fmt.Sprintf("ERROR: HTTP POST for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
-    raw := response.Content
+	raw := response.Content
 
 	err = json.Unmarshal(raw, &sessions)
 	if err != nil {
@@ -50,7 +50,7 @@ func (r *Redfish) Login() error {
 	r.Sessions = *sessions.Sessions.Id
 
 	jsonPayload := fmt.Sprintf("{ \"UserName\":\"%s\",\"Password\":\"%s\" }", r.Username, r.Password)
-    response, err = r.httpRequest(*sessions.Sessions.Id, "POST", nil, strings.NewReader(jsonPayload), false)
+	response, err = r.httpRequest(*sessions.Sessions.Id, "POST", nil, strings.NewReader(jsonPayload), false)
 	if err != nil {
 		return err
 	}

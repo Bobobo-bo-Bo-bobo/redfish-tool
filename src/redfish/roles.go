@@ -17,12 +17,12 @@ func (r *Redfish) GetRoles() ([]string, error) {
 		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-    response, err := r.httpRequest(r.AccountService, "GET", nil, nil, false)
+	response, err := r.httpRequest(r.AccountService, "GET", nil, nil, false)
 	if err != nil {
 		return result, err
 	}
 
-    raw := response.Content
+	raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
 		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
@@ -38,11 +38,11 @@ func (r *Redfish) GetRoles() ([]string, error) {
 		return result, nil
 	}
 
-    response, err = r.httpRequest(*accsvc.RolesEndpoint.Id, "GET", nil, nil, false)
+	response, err = r.httpRequest(*accsvc.RolesEndpoint.Id, "GET", nil, nil, false)
 	if err != nil {
 		return result, err
 	}
-    raw = response.Content
+	raw = response.Content
 
 	if response.StatusCode != http.StatusOK {
 		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
@@ -71,12 +71,12 @@ func (r *Redfish) GetRoleData(roleEndpoint string) (*RoleData, error) {
 		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-    response, err := r.httpRequest(roleEndpoint, "GET", nil, nil, false)
+	response, err := r.httpRequest(roleEndpoint, "GET", nil, nil, false)
 	if err != nil {
 		return nil, err
 	}
 
-    raw := response.Content
+	raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
 		return nil, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))

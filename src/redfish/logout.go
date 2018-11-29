@@ -22,7 +22,7 @@ func (r *Redfish) Logout() error {
 		return errors.New(fmt.Sprintf("BUG: X-Auth-Token set (value: %s) but no SessionLocation for this session found\n", *r.AuthToken))
 	}
 
-    response, err := r.httpRequest(*r.SessionLocation, "DELETE", nil, nil, false)
+	response, err := r.httpRequest(*r.SessionLocation, "DELETE", nil, nil, false)
 	if err != nil {
 		return err
 	}
