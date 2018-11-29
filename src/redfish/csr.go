@@ -1,11 +1,9 @@
 package redfish
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
@@ -15,8 +13,6 @@ func (r *Redfish) fetchCSR_HP(mgr *ManagerData) (string, error) {
 	var oemHp ManagerDataOemHp
 	var secsvc string
 	var oemSSvc SecurityServiceDataOemHp
-	var url string
-	var transp *http.Transport
 	var httpscertloc string
 	var httpscert HttpsCertDataOemHp
 
@@ -37,53 +33,15 @@ func (r *Redfish) fetchCSR_HP(mgr *ManagerData) (string, error) {
 		return csr, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, secsvc)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, secsvc)
-	}
-	request, err := http.NewRequest("GET", url, nil)
+	response, err := r.httpRequest(secsvc, "GET", nil, nil, false)
 	if err != nil {
 		return csr, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return csr, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return csr, err
-	}
-	response.Body.Close()
+	raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return csr, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return csr, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &oemSSvc)
@@ -92,43 +50,20 @@ func (r *Redfish) fetchCSR_HP(mgr *ManagerData) (string, error) {
 	}
 
 	if oemSSvc.Links.HttpsCert.Id == nil {
-		return csr, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", url))
+		return csr, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", response.Url))
 	}
 
 	httpscertloc = *oemSSvc.Links.HttpsCert.Id
 
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, httpscertloc)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, httpscertloc)
-	}
-	request, err = http.NewRequest("GET", url, nil)
+	response, err = r.httpRequest(httpscertloc, "GET", nil, nil, false)
 	if err != nil {
 		return csr, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err = client.Do(request)
-	if err != nil {
-		return csr, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err = ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return csr, err
-	}
-	response.Body.Close()
+	raw = response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return csr, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return csr, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &httpscert)
@@ -149,8 +84,6 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	var oemHp ManagerDataOemHp
 	var secsvc string
 	var oemSSvc SecurityServiceDataOemHp
-	var url string
-	var transp *http.Transport
 	var httpscertloc string
 	var httpscert HttpsCertDataOemHp
 
@@ -171,53 +104,15 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 		return csrTarget, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, secsvc)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, secsvc)
-	}
-	request, err := http.NewRequest("GET", url, nil)
+	response, err := r.httpRequest(secsvc, "GET", nil, nil, false)
 	if err != nil {
 		return csrTarget, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return csrTarget, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return csrTarget, err
-	}
-	response.Body.Close()
+	raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &oemSSvc)
@@ -226,43 +121,21 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	}
 
 	if oemSSvc.Links.HttpsCert.Id == nil {
-		return csrTarget, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", url))
+		return csrTarget, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", response.Url))
 	}
 
 	httpscertloc = *oemSSvc.Links.HttpsCert.Id
 
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, httpscertloc)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, httpscertloc)
-	}
-	request, err = http.NewRequest("GET", url, nil)
+	response, err = r.httpRequest(httpscertloc, "GET", nil, nil, false)
+
 	if err != nil {
 		return csrTarget, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err = client.Do(request)
-	if err != nil {
-		return csrTarget, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err = ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return csrTarget, err
-	}
-	response.Body.Close()
+	raw = response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &httpscert)
@@ -271,7 +144,7 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	}
 
 	if httpscert.Actions.GenerateCSR.Target == nil {
-		return csrTarget, errors.New(fmt.Sprintf("BUG: .Actions.GenerateCSR.Target is not present or empty in JSON data from %s", url))
+		return csrTarget, errors.New(fmt.Sprintf("BUG: .Actions.GenerateCSR.Target is not present or empty in JSON data from %s", response.Url))
 	}
 
 	csrTarget = *httpscert.Actions.GenerateCSR.Target
@@ -287,8 +160,10 @@ func (r *Redfish) getCSRTarget_Huawei(mgr *ManagerData) (string, error) {
 func (r *Redfish) GenCSR(csr CSRData) error {
 	var csrstr string = ""
 	var gencsrtarget string = ""
-	var transp *http.Transport
-	var url string
+
+	if r.AuthToken == nil || *r.AuthToken == "" {
+		return errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
 
 	// set vendor flavor
 	err := r.GetVendorFlavor()
@@ -357,59 +232,14 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 		return errors.New("BUG: CSR generation target is not known")
 	}
 
-	if r.AuthToken == nil || *r.AuthToken == "" {
-		return errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
-	}
-
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	// get URL for Systems endpoint
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, gencsrtarget)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, gencsrtarget)
-	}
-	request, err := http.NewRequest("POST", url, strings.NewReader(csrstr))
+	response, err := r.httpRequest(gencsrtarget, "POST", nil, strings.NewReader(csrstr), false)
 	if err != nil {
 		return err
 	}
-
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("Content-Type", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return err
-	}
-	response.Close = true
-
-	defer request.Body.Close()
-	defer response.Body.Close()
-
 	// XXX: do we need to look at the content returned by HTTP POST ?
-	_, err = ioutil.ReadAll(response.Body)
-	if err != nil {
-		return err
-	}
 
 	if response.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("ERROR: HTTP POST to %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return errors.New(fmt.Sprintf("ERROR: HTTP POST to %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	return nil

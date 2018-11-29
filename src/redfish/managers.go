@@ -1,73 +1,29 @@
 package redfish
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
 //get array of managers and their endpoints
 func (r *Redfish) GetManagers() ([]string, error) {
-	var url string
 	var mgrs OData
-	var transp *http.Transport
 	var result = make([]string, 0)
 
 	if r.AuthToken == nil || *r.AuthToken == "" {
 		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	// get URL for Systems endpoint
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.Managers)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, r.Managers)
-	}
-	request, err := http.NewRequest("GET", url, nil)
+    response, err := r.httpRequest(r.Managers, "GET", nil, nil, false)
 	if err != nil {
 		return result, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return result, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return result, err
-	}
-	response.Body.Close()
-
+    raw := response.Content
 	if response.StatusCode != http.StatusOK {
-		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &mgrs)
@@ -88,60 +44,20 @@ func (r *Redfish) GetManagers() ([]string, error) {
 // get manager data for a particular account
 func (r *Redfish) GetManagerData(managerEndpoint string) (*ManagerData, error) {
 	var result ManagerData
-	var url string
-	var transp *http.Transport
 
 	if r.AuthToken == nil || *r.AuthToken == "" {
 		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	// get URL for Systems endpoint
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, managerEndpoint)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, managerEndpoint)
-	}
-	request, err := http.NewRequest("GET", url, nil)
+    response, err := r.httpRequest(managerEndpoint, "GET", nil, nil, false)
 	if err != nil {
 		return nil, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	response.Close = true
-
-	defer response.Body.Close()
-
-	// store unparsed content
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
+    raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return nil, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &result)

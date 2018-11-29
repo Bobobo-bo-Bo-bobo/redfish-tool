@@ -1,73 +1,31 @@
 package redfish
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 )
 
 //get array of accounts and their endpoints
 func (r *Redfish) GetAccounts() ([]string, error) {
-	var url string
 	var accsvc AccountService
 	var accs OData
-	var transp *http.Transport
 	var result = make([]string, 0)
 
 	if r.AuthToken == nil || *r.AuthToken == "" {
 		return result, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	// get URL for Systems endpoint
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, r.AccountService)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, r.AccountService)
-	}
-	request, err := http.NewRequest("GET", url, nil)
+	response, err := r.httpRequest(r.AccountService, "GET", nil, nil, false)
 	if err != nil {
 		return result, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return result, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return result, err
-	}
-	response.Body.Close()
+	raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &accsvc)
@@ -79,38 +37,14 @@ func (r *Redfish) GetAccounts() ([]string, error) {
 		return result, errors.New("BUG: No Accounts endpoint found")
 	}
 
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, *accsvc.AccountsEndpoint.Id)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, *accsvc.AccountsEndpoint.Id)
-	}
-	request, err = http.NewRequest("GET", url, nil)
+	response, err = r.httpRequest(*accsvc.AccountsEndpoint.Id, "GET", nil, nil, false)
 	if err != nil {
 		return result, err
 	}
 
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err = client.Do(request)
-	if err != nil {
-		return result, err
-	}
-	response.Close = true
-
-	// store unparsed content
-	raw, err = ioutil.ReadAll(response.Body)
-	if err != nil {
-		response.Body.Close()
-		return result, err
-	}
-	response.Body.Close()
-
+	raw = response.Content
 	if response.StatusCode != http.StatusOK {
-		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return result, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &accs)
@@ -131,60 +65,21 @@ func (r *Redfish) GetAccounts() ([]string, error) {
 // get account data for a particular account
 func (r *Redfish) GetAccountData(accountEndpoint string) (*AccountData, error) {
 	var result AccountData
-	var url string
-	var transp *http.Transport
 
 	if r.AuthToken == nil || *r.AuthToken == "" {
 		return nil, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
 	}
 
-	if r.InsecureSSL {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}
-	} else {
-		transp = &http.Transport{
-			TLSClientConfig: &tls.Config{},
-		}
-	}
-
-	// get URL for Systems endpoint
-	client := &http.Client{
-		Timeout:   r.Timeout,
-		Transport: transp,
-	}
-	if r.Port > 0 {
-		url = fmt.Sprintf("https://%s:%d%s", r.Hostname, r.Port, accountEndpoint)
-	} else {
-		url = fmt.Sprintf("https://%s%s", r.Hostname, accountEndpoint)
-	}
-	request, err := http.NewRequest("GET", url, nil)
+	response, err := r.httpRequest(accountEndpoint, "GET", nil, nil, false)
 	if err != nil {
 		return nil, err
 	}
-
-	request.Header.Add("OData-Version", "4.0")
-	request.Header.Add("Accept", "application/json")
-	request.Header.Add("X-Auth-Token", *r.AuthToken)
-
-	request.Close = true
-
-	response, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	response.Close = true
-
-	defer response.Body.Close()
 
 	// store unparsed content
-	raw, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
+	raw := response.Content
 
 	if response.StatusCode != http.StatusOK {
-		return nil, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", url, response.Status))
+		return nil, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
 	}
 
 	err = json.Unmarshal(raw, &result)

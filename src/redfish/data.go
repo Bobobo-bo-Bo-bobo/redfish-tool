@@ -2,8 +2,12 @@ package redfish
 
 import (
 	"encoding/json"
+	"io"
+	"net/http"
 	"time"
 )
+
+const UserAgent string = "go-redfish/1.0.0"
 
 type OData struct {
 	Id           *string `json:"@odata.id"`
@@ -220,9 +224,12 @@ const (
 	REDFISH_SUPERMICRO
 )
 
-type Result struct {
-	RawContent *string
-	RawHeaders *string
+type HttpResult struct {
+	Url        string
+	StatusCode int
+	Status     string
+	Header     http.Header
+	Content    []byte
 }
 
 type BaseRedfish interface {
@@ -246,6 +253,7 @@ type BaseRedfish interface {
 	FetchCSR() (string, error)
 	ImportCertificate(string) error
 
+	httpRequest(string, string, *map[string]string, io.Reader, bool) (HttpResult, error)
 	getCSRTarget_HP(*ManagerData) (string, error)
 	getCSRTarget_Huawei(*ManagerData) (string, error)
 	fetchCSR_HP(*ManagerData) (string, error)
