@@ -83,6 +83,81 @@ func (r *Redfish) fetchCSR_HP(mgr *ManagerData) (string, error) {
 	return csr, nil
 }
 
+func (r *Redfish) fetchCSR_Huawei(mgr *ManagerData) (string, error) {
+	var csr string
+	var oemHuawei ManagerDataOemHuawei
+	var secsvc string
+	var oemSSvc SecurityServiceDataOemHuawei
+	var httpscertloc string
+	var httpscert HttpsCertDataOemHuawei
+
+	// parse Oem section from JSON
+	err := json.Unmarshal(mgr.Oem, &oemHuawei)
+	if err != nil {
+		return csr, err
+	}
+
+	// get SecurityService endpoint from .Oem.Huawei.SecurityService
+	if oemHuawei.Huawei.SecurityService.Id == nil {
+		return csr, errors.New("BUG: .Huawei.SecurityService.Id not found or null")
+	} else {
+		secsvc = *oemHuawei.Huawei.SecurityService.Id
+	}
+
+	if r.AuthToken == nil || *r.AuthToken == "" {
+		return csr, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
+
+	response, err := r.httpRequest(secsvc, "GET", nil, nil, false)
+	if err != nil {
+		return csr, err
+	}
+
+	raw := response.Content
+
+	if response.StatusCode != http.StatusOK {
+		return csr, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
+	}
+
+	err = json.Unmarshal(raw, &oemSSvc)
+	if err != nil {
+		return csr, err
+	}
+
+	if oemSSvc.Links.HttpsCert.Id == nil {
+		return csr, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", response.Url))
+	}
+
+	httpscertloc = *oemSSvc.Links.HttpsCert.Id
+
+	response, err = r.httpRequest(httpscertloc, "GET", nil, nil, false)
+	if err != nil {
+		return csr, err
+	}
+
+	raw = response.Content
+
+	if response.StatusCode != http.StatusOK {
+		return csr, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
+	}
+
+	err = json.Unmarshal(raw, &httpscert)
+	if err != nil {
+		return csr, err
+	}
+
+	if httpscert.CSR == nil {
+		// Note: We can't really distinguish between a running CSR generation or not.
+		// If no CSR generation has started and no certificate was imported the API reports "CertificateSigningRequest": null,
+		// whereas CertificateSigningRequest is not present when CSR generation is running but the JSON parser can't distinguish between both
+		// situations
+		return csr, errors.New(fmt.Sprintf("ERROR: No CertificateSigningRequest found. Either CSR generation hasn't been started or is still running"))
+	}
+
+	csr = *httpscert.CSR
+	return csr, nil
+}
+
 func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 	var csrTarget string
 	var oemHp ManagerDataOemHp
@@ -157,7 +232,73 @@ func (r *Redfish) getCSRTarget_HP(mgr *ManagerData) (string, error) {
 
 func (r *Redfish) getCSRTarget_Huawei(mgr *ManagerData) (string, error) {
 	var csrTarget string
+	var oemHuawei ManagerDataOemHuawei
+	var secsvc string
+	var oemSSvc SecurityServiceDataOemHuawei
+	var httpscertloc string
+	var httpscert HttpsCertDataOemHuawei
 
+	// parse Oem section from JSON
+	err := json.Unmarshal(mgr.Oem, &oemHuawei)
+	if err != nil {
+		return csrTarget, err
+	}
+
+	// get SecurityService endpoint from .Oem.Huawei.SecurityService
+	if oemHuawei.Huawei.SecurityService.Id == nil {
+		return csrTarget, errors.New("BUG: .Huawei.SecurityService.Id not found or null")
+	} else {
+		secsvc = *oemHuawei.Huawei.SecurityService.Id
+	}
+
+	if r.AuthToken == nil || *r.AuthToken == "" {
+		return csrTarget, errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
+
+	response, err := r.httpRequest(secsvc, "GET", nil, nil, false)
+	if err != nil {
+		return csrTarget, err
+	}
+
+	raw := response.Content
+
+	if response.StatusCode != http.StatusOK {
+		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
+	}
+
+	err = json.Unmarshal(raw, &oemSSvc)
+	if err != nil {
+		return csrTarget, err
+	}
+
+	if oemSSvc.Links.HttpsCert.Id == nil {
+		return csrTarget, errors.New(fmt.Sprintf("BUG: .links.HttpsCert.Id not present or is null in data from %s", response.Url))
+	}
+
+	httpscertloc = *oemSSvc.Links.HttpsCert.Id
+
+	response, err = r.httpRequest(httpscertloc, "GET", nil, nil, false)
+
+	if err != nil {
+		return csrTarget, err
+	}
+
+	raw = response.Content
+
+	if response.StatusCode != http.StatusOK {
+		return csrTarget, errors.New(fmt.Sprintf("ERROR: HTTP GET for %s returned \"%s\" instead of \"200 OK\"", response.Url, response.Status))
+	}
+
+	err = json.Unmarshal(raw, &httpscert)
+	if err != nil {
+		return csrTarget, err
+	}
+
+	if httpscert.Actions.GenerateCSR.Target == nil {
+		return csrTarget, errors.New(fmt.Sprintf("BUG: .Actions.GenerateCSR.Target is not present or empty in JSON data from %s", response.Url))
+	}
+
+	csrTarget = *httpscert.Actions.GenerateCSR.Target
 	return csrTarget, nil
 }
 
@@ -278,6 +419,10 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 			return err
 		}
 	} else if r.Flavor == REDFISH_HUAWEI {
+		gencsrtarget, err = r.getCSRTarget_Huawei(mgr0)
+		if err != nil {
+			return err
+		}
 	} else if r.Flavor == REDFISH_INSPUR {
 		return errors.New("ERROR: Inspur management boards do not support CSR generation")
 	} else if r.Flavor == REDFISH_SUPERMICRO {
@@ -331,6 +476,10 @@ func (r *Redfish) FetchCSR() (string, error) {
 			return csrstr, err
 		}
 	} else if r.Flavor == REDFISH_HUAWEI {
+		csrstr, err = r.fetchCSR_Huawei(mgr0)
+		if err != nil {
+			return csrstr, err
+		}
 	} else if r.Flavor == REDFISH_INSPUR {
 		return csrstr, errors.New("ERROR: Inspur management boards do not support CSR generation")
 	} else if r.Flavor == REDFISH_SUPERMICRO {

@@ -111,6 +111,14 @@ type ManagerData struct {
 	SelfEndpoint *string
 }
 
+type X509CertInfo struct {
+	Issuer         *string `json:"Issuer"`
+	SerialNumber   *string `json:"SerialNumber"`
+	Subject        *string `json:"Subject"`
+	ValidNotAfter  *string `json:"ValidNotAfter"`
+	ValidNotBefore *string `json:"ValidNotBefore"`
+}
+
 // HP/HPE: Oem data for Manager endpoint and SecurityService endpoint
 type OemHpLinkTargets struct {
 	Target *string `json:"target"`
@@ -185,24 +193,70 @@ type SecurityServiceDataOemHp struct {
 	Links SecurityServiceDataOemHpLinks `json:"Links"`
 }
 
-type X509CertInfoOemHp struct {
-	Issuer         *string `json:"Issuer"`
-	SerialNumber   *string `json:"SerialNumber"`
-	Subject        *string `json:"Subject"`
-	ValidNotAfter  *string `json:"ValidNotAfter"`
-	ValidNotBefore *string `json:"ValidNotBefore"`
-}
-
 type HttpsCertActionsOemHp struct {
-	GenerateCSR                OemHpLinkTargets  `json:"#HpHttpsCert.GenerateCSR"`
-	ImportCertificate          OemHpLinkTargets  `json:"#HpHttpsCert.ImportCertificate"`
-	X509CertificateInformation X509CertInfoOemHp `json:"X509CertificateInformation"`
+	GenerateCSR                OemHpLinkTargets `json:"#HpHttpsCert.GenerateCSR"`
+	ImportCertificate          OemHpLinkTargets `json:"#HpHttpsCert.ImportCertificate"`
+	X509CertificateInformation X509CertInfo     `json:"X509CertificateInformation"`
 }
 
 type HttpsCertDataOemHp struct {
 	CSR     *string               `json:"CertificateSigningRequest"`
 	Id      *string               `json:"Id"`
 	Actions HttpsCertActionsOemHp `json:"Actions"`
+}
+
+// Huawei: Oem data for Manager endpoint and SecurityService endpoint
+type OemHuaweiLinkTargets struct {
+	Target     *string `json:"target"`
+	ActionInfo *string `json:"@Redfish.ActionInfo"`
+}
+
+type HttpsCertActionsOemHuawei struct {
+	GenerateCSR                OemHuaweiLinkTargets `json:"#HpHttpsCert.GenerateCSR"`
+	ImportCertificate          OemHuaweiLinkTargets `json:"#HttpsCert.ImportServerCertificate"`
+	X509CertificateInformation X509CertInfo         `json:"X509CertificateInformation"`
+}
+
+type HttpsCertDataOemHuawei struct {
+	CSR     *string                   `json:"CertificateSigningRequest"`
+	Id      *string                   `json:"Id"`
+	Actions HttpsCertActionsOemHuawei `json:"Actions"`
+}
+
+type ManagerDataOemHuaweiLoginRule struct {
+	MemberId    *string `json:"MemberId"`
+	RuleEnabled bool    `json:"RuleEnabled"`
+	StartTime   *string `json:"StartTime"`
+	EndTime     *string `json:"EndTime"`
+	IP          *string `json:"IP"`
+	Mac         *string `json:"Mac"`
+}
+type SecurityServiceDataOemHuaweiLinks struct {
+	HttpsCert OData `json:"HttpsCert"`
+}
+
+type SecurityServiceDataOemHuawei struct {
+	Id    *string                           `json:"Id"`
+	Name  *string                           `json:"Name"`
+	Links SecurityServiceDataOemHuaweiLinks `json:"Links"`
+}
+
+type _managerDataOemHuawei struct {
+	BMCUpTime       *string                         `json:"BMCUpTime"`
+	ProductUniqueID *string                         `json:"ProductUniqueID"`
+	PlatformType    *string                         `json:"PlatformType"`
+	LoginRule       []ManagerDataOemHuaweiLoginRule `json:"LoginRule"`
+
+	SecurityService OData `json:"SecurityService"`
+	SnmpService     OData `json:"SnmpService"`
+	SmtpService     OData `json:"SmtpService"`
+	SyslogService   OData `json:"SyslogService"`
+	KvmService      OData `json:"KvmService"`
+	NtpService      OData `json:"NtpService"`
+}
+
+type ManagerDataOemHuawei struct {
+	Huawei _managerDataOemHuawei `json:"Huawei"`
 }
 
 // data for CSR subject
