@@ -35,9 +35,9 @@ func ShowUsage() {
 		"\n"+
 		"Commands:\n"+
 		"\n"+
-		"  get-all-users\n"+
+		"  get-all-users - List all users from service processor\n"+
 		"\n"+
-		"  get-user\n"+
+		"  get-user - List specific user from service processor\n"+
 		"    -name=<name>\n"+
 		"         Get detailed information for user identified by name (*)\n"+
 		"    -id=<id>\n"+
@@ -45,17 +45,23 @@ func ShowUsage() {
 		"\n"+
 		"    (*) -name and -id are mutually exclusive\n"+
 		"\n"+
-		"  get-all-roles\n"+
+		"  get-all-roles - List all roles from service processor (*)\n"+
 		"\n"+
-		"  get-role\n"+
+		"    (*) HP/HPE servers do not defined roles\n"+
+		"        Inspur servers report AccountService endpoint but don't implement it\n"+
+		"\n"+
+		"  get-role - List sepcific role (*)\n"+
 		"    -id=<id>\n"+
 		"         Get detailed information for role identified by ID (**)\n"+
 		"\n"+
+		"    (*) HP/HPE servers do not defined roles\n"+
+		"        Inspur servers report AccountService endpoint but don't implement it\n"+
+		"\n"+
 		"    (**) Because role names are not unique, roles can only be listed by ID\n"+
 		"\n"+
-		"  get-all-managers\n"+
+		"  get-all-managers - List all managers\n"+
 		"\n"+
-		"  get-manager\n"+
+		"  get-manager - List specific manager\n"+
 		"    -uuid=<uuid>\n"+
 		"         Get detailed information for user identified by UUID (*)\n"+
 		"    -id=<id>\n"+
@@ -63,9 +69,9 @@ func ShowUsage() {
 		"\n"+
 		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+
-		"  get-all-systems\n"+
+		"  get-all-systems - List all systems\n"+
 		"\n"+
-		"  get-system\n"+
+		"  get-system - List specific system\n"+
 		"    -uuid=<uuid>\n"+
 		"         Get detailed information for system identified by UUID (*)\n"+
 		"    -id=<id>\n"+
@@ -73,7 +79,7 @@ func ShowUsage() {
 		"\n"+
 		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+
-		"  gen-csr\n"+
+		"  gen-csr - Generate certificate signing request (*)\n"+
 		"    -country=<c>\n"+
 		"       CSR - country\n"+
 		"    -state=<s>\n"+
@@ -87,11 +93,18 @@ func ShowUsage() {
 		"   -common-name=<cn>\n"+
 		"       CSR - common name, hostname will be used if no CN is set\n"+
 		"\n"+
-		"  fetch-csr\n"+
+		"   (*) Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
 		"\n"+
-		"  import-cert\n"+
+		"  fetch-csr - Fetch generated certificate signing request (*)\n"+
+		"\n"+
+		"   (*) Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
+		"\n"+
+		"  import-cert - Import certificate in PEM format (*)\n"+
 		"    -certificate=<cert>\n"+
 		"       Certificate file in PEM format to import\n"+
 		"\n"+
+		"   (*) Inspur and Supermicro service processors do not provide endpoints for certificate import\n"+
+		"\n"+
+		"  reset-sp - Reset service processor\n"+
 		"\n", version)
 }

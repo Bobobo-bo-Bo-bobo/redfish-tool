@@ -90,6 +90,10 @@ type RoleData struct {
 	SelfEndpoint *string
 }
 
+type ManagerActionsData struct {
+	ManagerReset LinkTargets `json:"#Manager.Reset"`
+}
+
 type ManagerData struct {
 	Id              *string         `json:"Id"`
 	Name            *string         `json:"Name"`
@@ -98,6 +102,8 @@ type ManagerData struct {
 	Status          Status          `json:"Status"`
 	FirmwareVersion *string         `json:"FirmwareVersion"`
 	Oem             json.RawMessage `json:"Oem"`
+	Actions         json.RawMessage `json:"Actions"` // may contain vendor specific data and endpoints
+
 	/* futher data
 	   VirtualMedia
 	   SerialConsole
@@ -119,11 +125,12 @@ type X509CertInfo struct {
 	ValidNotBefore *string `json:"ValidNotBefore"`
 }
 
-// HP/HPE: Oem data for Manager endpoint and SecurityService endpoint
-type OemHpLinkTargets struct {
-	Target *string `json:"target"`
+type LinkTargets struct {
+	Target     *string `json:"target"`
+	ActionInfo *string `json:"@Redfish.ActionInfo"`
 }
 
+// HP/HPE: Oem data for Manager endpoint and SecurityService endpoint
 type ManagerDataOemHpLicense struct {
 	Key    *string `json:"LicenseKey"`
 	String *string `json:"LicenseString"`
@@ -194,9 +201,9 @@ type SecurityServiceDataOemHp struct {
 }
 
 type HttpsCertActionsOemHp struct {
-	GenerateCSR                OemHpLinkTargets `json:"#HpHttpsCert.GenerateCSR"`
-	ImportCertificate          OemHpLinkTargets `json:"#HpHttpsCert.ImportCertificate"`
-	X509CertificateInformation X509CertInfo     `json:"X509CertificateInformation"`
+	GenerateCSR                LinkTargets  `json:"#HpHttpsCert.GenerateCSR"`
+	ImportCertificate          LinkTargets  `json:"#HpHttpsCert.ImportCertificate"`
+	X509CertificateInformation X509CertInfo `json:"X509CertificateInformation"`
 }
 
 type HttpsCertDataOemHp struct {
@@ -206,15 +213,10 @@ type HttpsCertDataOemHp struct {
 }
 
 // Huawei: Oem data for Manager endpoint and SecurityService endpoint
-type OemHuaweiLinkTargets struct {
-	Target     *string `json:"target"`
-	ActionInfo *string `json:"@Redfish.ActionInfo"`
-}
-
 type HttpsCertActionsOemHuawei struct {
-	GenerateCSR                OemHuaweiLinkTargets `json:"#HpHttpsCert.GenerateCSR"`
-	ImportCertificate          OemHuaweiLinkTargets `json:"#HttpsCert.ImportServerCertificate"`
-	X509CertificateInformation X509CertInfo         `json:"X509CertificateInformation"`
+	GenerateCSR                LinkTargets  `json:"#HpHttpsCert.GenerateCSR"`
+	ImportCertificate          LinkTargets  `json:"#HttpsCert.ImportServerCertificate"`
+	X509CertificateInformation X509CertInfo `json:"X509CertificateInformation"`
 }
 
 type HttpsCertDataOemHuawei struct {
@@ -257,6 +259,15 @@ type _managerDataOemHuawei struct {
 
 type ManagerDataOemHuawei struct {
 	Huawei _managerDataOemHuawei `json:"Huawei"`
+}
+
+// Supermicro: Oem data for Manager.Actions endpoint
+type ManagerActionsDataOemSupermicro struct {
+	Oem _managerActionsDataOemSupermicro `json:"Oem"`
+}
+
+type _managerActionsDataOemSupermicro struct {
+	ManagerReset LinkTargets `json:"#Manager.Reset"`
 }
 
 // data for CSR subject
@@ -306,6 +317,7 @@ type BaseRedfish interface {
 	GenCSR(CSRData) error
 	FetchCSR() (string, error)
 	ImportCertificate(string) error
+	ResetSP() error
 
 	httpRequest(string, string, *map[string]string, io.Reader, bool) (HttpResult, error)
 	getCSRTarget_HP(*ManagerData) (string, error)
