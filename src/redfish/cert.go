@@ -173,8 +173,17 @@ func (r *Redfish) ImportCertificate(cert string) error {
 		if err != nil {
 			return err
 		}
+
+		// HP/HPE service processors (iLO) will reboot automatically
+		// if the certificate has been imported successfully
 	} else if r.Flavor == REDFISH_HUAWEI {
 		certtarget, err = r.getImportCertTarget_Huawei(mgr0)
+		if err != nil {
+			return err
+		}
+
+		// Reboot service processor to activate new certificate
+		err = r.ResetSP()
 		if err != nil {
 			return err
 		}
