@@ -161,19 +161,8 @@ func (r *Redfish) getCSRTarget_Huawei(mgr *ManagerData) (string, error) {
 	return csrTarget, nil
 }
 
-func (r *Redfish) GenCSR(csr CSRData) error {
+func (r *Redfish) makeCSRPayload_HP(csr CSRData) string {
 	var csrstr string = ""
-	var gencsrtarget string = ""
-
-	if r.AuthToken == nil || *r.AuthToken == "" {
-		return errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
-	}
-
-	// set vendor flavor
-	err := r.GetVendorFlavor()
-	if err != nil {
-		return err
-	}
 
 	if csr.C == "" {
 		csr.C = "XX"
@@ -204,6 +193,71 @@ func (r *Redfish) GenCSR(csr CSRData) error {
 	}
 
 	csrstr = "{ " + csrstr + " } "
+	return csrstr
+}
+
+func (r *Redfish) makeCSRPayload_Vanilla(csr CSRData) string {
+	var csrstr string = ""
+
+	if csr.C != "" {
+		csrstr += fmt.Sprintf("\"Country\": \"%s\", ", csr.C)
+	} else {
+		csrstr += "XX"
+	}
+
+	if csr.S != "" {
+		csrstr += fmt.Sprintf("\"State\": \"%s\", ", csr.S)
+	}
+
+	if csr.L != "" {
+		csrstr += fmt.Sprintf("\"City\": \"%s\", ", csr.L)
+	}
+
+	if csr.O != "" {
+		csrstr += fmt.Sprintf("\"OrgName\": \"%s\", ", csr.O)
+	}
+
+	if csr.OU != "" {
+		csrstr += fmt.Sprintf("\"OrgUnit\": \"%s\", ", csr.OU)
+	}
+
+	if csr.CN != "" {
+		csrstr += fmt.Sprintf("\"CommonName\": \"%s\" ", csr.CN)
+	} else {
+		csrstr += fmt.Sprintf("\"CommonName\": \"%s\" ", r.Hostname)
+	}
+
+	csrstr = "{ " + csrstr + " } "
+	return csrstr
+}
+
+func (r *Redfish) makeCSRPayload(csr CSRData) string {
+	var csrstr string
+
+	if r.Flavor == REDFISH_HP {
+		csrstr = r.makeCSRPayload_HP(csr)
+	} else {
+		csrstr = r.makeCSRPayload_Vanilla(csr)
+	}
+
+	return csrstr
+}
+
+func (r *Redfish) GenCSR(csr CSRData) error {
+	var csrstr string = ""
+	var gencsrtarget string = ""
+
+	if r.AuthToken == nil || *r.AuthToken == "" {
+		return errors.New(fmt.Sprintf("ERROR: No authentication token found, is the session setup correctly?"))
+	}
+
+	// set vendor flavor
+	err := r.GetVendorFlavor()
+	if err != nil {
+		return err
+	}
+
+	csrstr = r.makeCSRPayload(csr)
 
 	// get list of Manager endpoint
 	mgr_list, err := r.GetManagers()

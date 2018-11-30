@@ -256,6 +256,9 @@ type BaseRedfish interface {
 	httpRequest(string, string, *map[string]string, io.Reader, bool) (HttpResult, error)
 	getCSRTarget_HP(*ManagerData) (string, error)
 	getCSRTarget_Huawei(*ManagerData) (string, error)
+	makeCSRPayload(CSRData) string
+	makeCSRPayload_HP(CSRData) string
+	makeCSRPayload_Vanilla(CSRData) string
 	fetchCSR_HP(*ManagerData) (string, error)
 	fetchCSR_Huawei(*ManagerData) (string, error)
 	getImportCertTarget_HP(*ManagerData) (string, error)
