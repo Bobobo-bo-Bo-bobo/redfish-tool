@@ -21,6 +21,20 @@ func FetchCSR(r redfish.Redfish) error {
 
 	defer r.Logout()
 
+    // check if vendor support roles
+    err = r.GetVendorFlavor()
+    if err != nil {
+        return err
+    }
+
+    capa, found := redfish.VendorCapabilities[r.FlavorString]
+    if found {
+        if capa & redfish.HAS_SECURITYSERVICE != redfish.HAS_SECURITYSERVICE {
+            fmt.Println(r.Hostname)
+            return errors.New("Vendor does not support CSR generation")
+        }
+    }
+
 	csr, err := r.FetchCSR()
 	if err != nil {
 		return err
