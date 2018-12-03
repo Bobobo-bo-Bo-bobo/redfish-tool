@@ -22,6 +22,20 @@ func GetAllRoles(r redfish.Redfish) error {
 
 	defer r.Logout()
 
+    // check if vendor support roles
+    err = r.GetVendorFlavor()
+    if err != nil {
+        return err
+    }
+
+    capa, found := redfish.VendorCapabilities[r.FlavorString]
+    if found {
+        if capa & redfish.HAS_ACCOUNT_ROLES != redfish.HAS_ACCOUNT_ROLES {
+            fmt.Println(r.Hostname)
+            return errors.New("Vendor does not support roles")
+        }
+    }
+
 	// get all role endpoints - Note: role names are _NOT_ unique but IDs are!
 	rmap, err := r.MapRolesById()
 	if err != nil {

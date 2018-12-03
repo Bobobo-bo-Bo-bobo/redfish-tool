@@ -162,14 +162,19 @@ func (r *Redfish) GetVendorFlavor() error {
 		_manufacturer := strings.TrimSpace(strings.ToLower(*_sys0.Manufacturer))
 		if _manufacturer == "hp" || _manufacturer == "hpe" {
 			r.Flavor = REDFISH_HP
+            r.FlavorString = "hp"
 		} else if _manufacturer == "huawei" {
 			r.Flavor = REDFISH_HUAWEI
+            r.FlavorString = "huawei"
 		} else if _manufacturer == "inspur" {
 			r.Flavor = REDFISH_INSPUR
+            r.FlavorString = "inspur"
 		} else if _manufacturer == "supermicro" {
 			r.Flavor = REDFISH_SUPERMICRO
+            r.FlavorString = "supermicro"
 		} else {
 			r.Flavor = REDFISH_GENERAL
+            r.FlavorString = "vanilla"
 		}
 	}
 

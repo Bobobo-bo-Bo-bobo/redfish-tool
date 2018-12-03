@@ -149,6 +149,22 @@ const (
 	REDFISH_SUPERMICRO
 )
 
+// service processor capabilities
+const (
+    HAS_ACCOUNTSERVICE uint = 1 << iota // has AccountService endpoint
+    HAS_SECURITYSERVICE
+    HAS_ACCOUNT_ROLES
+)
+
+// map capabilities by vendor
+var VendorCapabilities = map[string]uint{
+    "hp": HAS_ACCOUNTSERVICE | HAS_SECURITYSERVICE,
+    "huawei": HAS_ACCOUNTSERVICE | HAS_SECURITYSERVICE | HAS_ACCOUNT_ROLES,
+    "inspur": 0,
+    "supermicro": HAS_ACCOUNTSERVICE | HAS_ACCOUNT_ROLES,
+    "vanilla": HAS_ACCOUNTSERVICE | HAS_SECURITYSERVICE | HAS_ACCOUNT_ROLES,
+}
+
 type HttpResult struct {
 	Url        string
 	StatusCode int
@@ -214,4 +230,5 @@ type Redfish struct {
 
 	// Vendor "flavor"
 	Flavor uint
+    FlavorString    string
 }
