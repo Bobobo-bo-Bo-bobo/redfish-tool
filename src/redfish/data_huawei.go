@@ -48,4 +48,3 @@ type _managerDataOemHuawei struct {
 type ManagerDataOemHuawei struct {
 	Huawei _managerDataOemHuawei `json:"Huawei"`
 }
-

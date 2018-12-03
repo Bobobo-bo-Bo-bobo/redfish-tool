@@ -130,7 +130,6 @@ type LinkTargets struct {
 	ActionInfo *string `json:"@Redfish.ActionInfo"`
 }
 
-
 // data for CSR subject
 type CSRData struct {
 	C  string // Country
@@ -179,7 +178,7 @@ type BaseRedfish interface {
 	FetchCSR() (string, error)
 	ImportCertificate(string) error
 	ResetSP() error
-    GetVendorFlavor() error
+	GetVendorFlavor() error
 
 	httpRequest(string, string, *map[string]string, io.Reader, bool) (HttpResult, error)
 	getCSRTarget_HP(*ManagerData) (string, error)
