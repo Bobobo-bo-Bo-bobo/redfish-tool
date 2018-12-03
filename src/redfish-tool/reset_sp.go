@@ -3,7 +3,7 @@ package main
 import (
     "errors"
 	"fmt"
-	"redfish"
+    redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func ResetSP(r redfish.Redfish) error {

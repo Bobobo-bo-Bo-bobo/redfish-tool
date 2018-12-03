@@ -4,11 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"redfish"
 	"strings"
 	"syscall"
 	"time"
 
+    redfish "git.ypbind.de/repository/go-redfish.git"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

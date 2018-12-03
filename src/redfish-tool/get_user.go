@@ -5,8 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"redfish"
+    redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GetUser(r redfish.Redfish, args []string) error {

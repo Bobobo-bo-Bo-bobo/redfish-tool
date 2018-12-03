@@ -4,7 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"redfish"
+    redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GenCSR(r redfish.Redfish, args []string) error {

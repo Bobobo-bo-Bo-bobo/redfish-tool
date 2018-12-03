@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"redfish"
+    redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GetAllRoles(r redfish.Redfish) error {

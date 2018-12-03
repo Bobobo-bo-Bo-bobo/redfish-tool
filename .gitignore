@@ -1,6 +1,7 @@
 .idea
 bin
 src/golang.org
+src/git.ypbind.de
 pkg
 *.swp
 tmp/

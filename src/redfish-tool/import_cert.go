@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"redfish"
+    redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func ImportCertificate(r redfish.Redfish, args []string) error {
