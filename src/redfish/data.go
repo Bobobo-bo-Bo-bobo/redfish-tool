@@ -318,6 +318,7 @@ type BaseRedfish interface {
 	FetchCSR() (string, error)
 	ImportCertificate(string) error
 	ResetSP() error
+    GetVendorFlavor() error
 
 	httpRequest(string, string, *map[string]string, io.Reader, bool) (HttpResult, error)
 	getCSRTarget_HP(*ManagerData) (string, error)
