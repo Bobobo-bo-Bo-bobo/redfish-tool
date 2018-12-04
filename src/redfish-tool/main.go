@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-    redfish "git.ypbind.de/repository/go-redfish.git"
+	redfish "git.ypbind.de/repository/go-redfish.git"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

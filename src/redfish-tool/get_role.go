@@ -4,8 +4,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	redfish "git.ypbind.de/repository/go-redfish.git"
 	"os"
-    redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GetRole(r redfish.Redfish, args []string) error {
@@ -38,19 +38,19 @@ func GetRole(r redfish.Redfish, args []string) error {
 
 	defer r.Logout()
 
-    // check if vendor support roles
-    err = r.GetVendorFlavor()
-    if err != nil {
-        return err
-    }
+	// check if vendor support roles
+	err = r.GetVendorFlavor()
+	if err != nil {
+		return err
+	}
 
-    capa, found := redfish.VendorCapabilities[r.FlavorString]
-    if found {
-        if capa & redfish.HAS_ACCOUNT_ROLES != redfish.HAS_ACCOUNT_ROLES {
-            fmt.Println(r.Hostname)
-            return errors.New("Vendor does not support roles")
-        }
-    }
+	capa, found := redfish.VendorCapabilities[r.FlavorString]
+	if found {
+		if capa&redfish.HAS_ACCOUNT_ROLES != redfish.HAS_ACCOUNT_ROLES {
+			fmt.Println(r.Hostname)
+			return errors.New("Vendor does not support roles")
+		}
+	}
 
 	// get all roles
 	rmap, err = r.MapRolesById()

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-    redfish "git.ypbind.de/repository/go-redfish.git"
+	redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GetAllSystems(r redfish.Redfish) error {

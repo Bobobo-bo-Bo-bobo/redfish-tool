@@ -4,7 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-    redfish "git.ypbind.de/repository/go-redfish.git"
+	redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GenCSR(r redfish.Redfish, args []string) error {
@@ -35,19 +35,19 @@ func GenCSR(r redfish.Redfish, args []string) error {
 
 	defer r.Logout()
 
-    // check if vendor support roles
-    err = r.GetVendorFlavor()
-    if err != nil {
-        return err
-    }
+	// check if vendor support roles
+	err = r.GetVendorFlavor()
+	if err != nil {
+		return err
+	}
 
-    capa, found := redfish.VendorCapabilities[r.FlavorString]
-    if found {
-        if capa & redfish.HAS_SECURITYSERVICE != redfish.HAS_SECURITYSERVICE {
-            fmt.Println(r.Hostname)
-            return errors.New("Vendor does not support CSR generation")
-        }
-    }
+	capa, found := redfish.VendorCapabilities[r.FlavorString]
+	if found {
+		if capa&redfish.HAS_SECURITYSERVICE != redfish.HAS_SECURITYSERVICE {
+			fmt.Println(r.Hostname)
+			return errors.New("Vendor does not support CSR generation")
+		}
+	}
 
 	csrdata = redfish.CSRData{
 		C:  *c,

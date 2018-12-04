@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-    redfish "git.ypbind.de/repository/go-redfish.git"
+	redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func GetAllUsers(r redfish.Redfish) error {

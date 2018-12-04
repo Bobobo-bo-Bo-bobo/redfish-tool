@@ -1,9 +1,9 @@
 package main
 
 import (
-    "errors"
+	"errors"
 	"fmt"
-    redfish "git.ypbind.de/repository/go-redfish.git"
+	redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
 func ResetSP(r redfish.Redfish) error {
