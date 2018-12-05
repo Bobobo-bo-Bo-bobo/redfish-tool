@@ -47,7 +47,19 @@ func Passwd(r redfish.Redfish, args []string) error {
 	if *password == "" {
 		fmt.Printf("Password for %s: ", *name)
 		raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
-		*password = strings.TrimSpace(string(raw_pass))
+        fmt.Println()
+        pass1 := strings.TrimSpace(string(raw_pass))
+
+		fmt.Printf("Repeat password for %s: ", *name)
+		raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
+        fmt.Println()
+        pass2 := strings.TrimSpace(string(raw_pass))
+
+        if pass1 != pass2 {
+            return errors.New(fmt.Sprintf("ERROR: Passwords does not match for user %s", *name)
+        }
+
+        *password = pass1
 	}
 
 	err = r.ChangePassword(*name, *password)
