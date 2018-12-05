@@ -60,10 +60,12 @@ func AddUser(r redfish.Redfish, args []string) error {
 
 	// ask for password ?
 	if *password == "" {
-		fmt.Printf("Password for %s: ", *name)
+        fmt.Print("Password for " + *name + ": ")
 		raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
 		acc.Password = strings.TrimSpace(string(raw_pass))
-	}
+	} else {
+        acc.Password = *password
+    }
 
 	err = r.AddAccount(acc)
 	if err != nil {
