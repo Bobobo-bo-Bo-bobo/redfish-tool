@@ -106,5 +106,31 @@ func ShowUsage() {
 		"   (*) Inspur and Supermicro service processors do not provide endpoints for certificate import\n"+
 		"\n"+
 		"  reset-sp - Reset service processor\n"+
+		"\n"+
+		"  add-user - Create a new user\n"+
+		"    -name=<name>\n"+
+		"        Name of user account to create\n"+
+		"    -role=<role>\n"+
+		"        Role of user account to create\n"+
+		"    -password=<pass>\n"+
+		"        Password for new user account. If omitted the password will be asked and read from stdin\n"+
+		"\n"+
+		"  del-user - Delete an existing account\n"+
+		"    -name=<name>\n"+
+		"        Name of the account to delete\n"+
+		"\n"+
+		"  passwd - Change password of an existing account\n"+
+		"    -name=<name>\n"+
+		"        Name of the user account\n"+
+		"    -password=<pass>\n"+
+		"        New password. If omitted the password will be asked and read from stdin\n"+
+		"\n"+
+		"  mod-user - Modify an existing user\n"+
+		"    -name=<name>\n"+
+		"        Name of user account to modify\n"+
+		"    -new-name=<new_name>\n"+
+		"        New name of user account\n"+
+		"    -role=<role>\n"+
+		"        New role of user account\n"+
 		"\n", version)
 }
