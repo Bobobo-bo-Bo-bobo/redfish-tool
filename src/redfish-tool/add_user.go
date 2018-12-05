@@ -60,24 +60,24 @@ func AddUser(r redfish.Redfish, args []string) error {
 
 	// ask for password ?
 	if *password == "" {
-        fmt.Printf("Password for %s: ", *name)
+		fmt.Printf("Password for %s: ", *name)
 		raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
-        pass1 := strings.TrimSpace(string(raw_pass))
-        fmt.Println()
+		pass1 := strings.TrimSpace(string(raw_pass))
+		fmt.Println()
 
-        fmt.Printf("Repeat password for %s: ", *name)
-		raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
-        pass2 := strings.TrimSpace(string(raw_pass))
-        fmt.Println()
+		fmt.Printf("Repeat password for %s: ", *name)
+		raw_pass, _ = terminal.ReadPassword(int(syscall.Stdin))
+		pass2 := strings.TrimSpace(string(raw_pass))
+		fmt.Println()
 
-        if pass1 != pass2 {
-            return errors.New(fmt.Sprintf("ERROR: Passwords does not match for user %s", *name))
-        }
+		if pass1 != pass2 {
+			return errors.New(fmt.Sprintf("ERROR: Passwords does not match for user %s", *name))
+		}
 
-        acc.Password = pass1
+		acc.Password = pass1
 	} else {
-        acc.Password = *password
-    }
+		acc.Password = *password
+	}
 
 	err = r.AddAccount(acc)
 	if err != nil {
