@@ -18,6 +18,8 @@ func AddUser(r redfish.Redfish, args []string) error {
 	var name = argParse.String("name", "", "Name of user account to create")
 	var role = argParse.String("role", "", "Role of user account to create")
 	var password = argParse.String("password", "", "Password for new user account. If omitted the password will be asked and read from stdin")
+	var disabled = argParse.Bool("disabled", false, "Created account is disabled")
+	var locked = argParse.Bool("locked", false, "Created account is locked")
 
 	argParse.Parse(args)
 
@@ -77,6 +79,15 @@ func AddUser(r redfish.Redfish, args []string) error {
 		acc.Password = pass1
 	} else {
 		acc.Password = *password
+	}
+
+	if *disabled {
+		enabled := false
+		acc.Enabled = &enabled
+	}
+
+	if *locked {
+		acc.Locked = locked
 	}
 
 	err = r.AddAccount(acc)

@@ -148,6 +148,11 @@ func main() {
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			}
+		} else if command == "modify-user" {
+			err = ModifyUser(rf, trailing[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
 		} else if command == "passwd" {
 			err = Passwd(rf, trailing[1:])
 			if err != nil {

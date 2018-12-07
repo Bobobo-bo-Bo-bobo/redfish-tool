@@ -114,6 +114,10 @@ func ShowUsage() {
 		"        Role of user account to create\n"+
 		"    -password=<pass>\n"+
 		"        Password for new user account. If omitted the password will be asked and read from stdin\n"+
+		"    -disabled\n"+
+		"        Account is created but disabled\n"+
+		"    -locked\n"+
+		"        Account is created and locked\n"+
 		"\n"+
 		"  del-user - Delete an existing account\n"+
 		"    -name=<name>\n"+
@@ -125,12 +129,20 @@ func ShowUsage() {
 		"    -password=<pass>\n"+
 		"        New password. If omitted the password will be asked and read from stdin\n"+
 		"\n"+
-		"  mod-user - Modify an existing user\n"+
+		"  modify-user - Modify an existing user\n"+
 		"    -name=<name>\n"+
 		"        Name of user account to modify\n"+
-		"    -new-name=<new_name>\n"+
+		"    -rename=<new_name>\n"+
 		"        New name of user account\n"+
 		"    -role=<role>\n"+
 		"        New role of user account\n"+
+		"    -lock\n"+
+		"        Lock user\n"+
+		"    -unlock\n"+
+		"        Unlock user\n"+
+		"    -enable\n"+
+		"        Enable user\n"+
+		"    -disable\n"+
+		"        Disable user\n"+
 		"\n", version)
 }
