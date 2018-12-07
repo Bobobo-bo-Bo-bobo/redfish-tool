@@ -19,6 +19,7 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 	var rename = argParse.String("rename", "", "Rename account to new name")
 	var role = argParse.String("role", "", "New role of user account")
 	var password = argParse.String("password", "", "New password for user account")
+	var password_file = argParse.String("password-file", "", "Read password from file")
 	var ask_password = argParse.Bool("ask-password", false, "New password for user account, will be read from stdin")
 	var enable = argParse.Bool("enable", false, "Enable account")
 	var disable = argParse.Bool("disable", false, "Disable account")
@@ -31,6 +32,14 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 
 	if *enable && *disable {
 		return errors.New("ERROR: -enable and -disable are mutually exclusive")
+	}
+
+	if *password != "" && *password_file != "" {
+		return errors.New("ERROR: -password and -password-file are mutually exclusive")
+	}
+
+	if (*password != "" || *password_file != "") && *ask_password {
+		return errors.New("ERROR: -password/-password-file and -ask-password are mutually exclusive")
 	}
 
 	if *enable {
@@ -116,6 +125,12 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 
 	if *password != "" {
 		acc.Password = *password
+	} else if *password_file != "" {
+		passwd, err := ReadSingleLine(*password_file)
+		if err != nil {
+			return err
+		}
+		acc.Password = passwd
 	}
 
 	err = r.ModifyAccount(*name, acc)

@@ -114,6 +114,8 @@ func ShowUsage() {
 		"        Role of user account to create\n"+
 		"    -password=<pass>\n"+
 		"        Password for new user account. If omitted the password will be asked and read from stdin\n"+
+		"    -password-file=<file>\n"+
+		"        Read password from <file>. The password MUST be the first line in the file, all other lines are ignored\n"+
 		"    -disabled\n"+
 		"        Account is created but disabled\n"+
 		"    -locked\n"+
@@ -128,6 +130,8 @@ func ShowUsage() {
 		"        Name of the user account\n"+
 		"    -password=<pass>\n"+
 		"        New password. If omitted the password will be asked and read from stdin\n"+
+		"    -password-file=<file>\n"+
+		"        Read new password from <file>. The password MUST be the first line in the file, all other lines are ignored\n"+
 		"\n"+
 		"  modify-user - Modify an existing user\n"+
 		"    -name=<name>\n"+
@@ -144,5 +148,9 @@ func ShowUsage() {
 		"        Enable user\n"+
 		"    -disable\n"+
 		"        Disable user\n"+
+		"    -password=<pass>\n"+
+		"        New password. If omitted the password will be asked and read from stdin\n"+
+		"    -password-file=<file>\n"+
+		"        Read new password from <file>. The password MUST be the first line in the file, all other lines are ignored\n"+
 		"\n", version)
 }

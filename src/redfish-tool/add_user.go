@@ -20,6 +20,7 @@ func AddUser(r redfish.Redfish, args []string) error {
 	var password = argParse.String("password", "", "Password for new user account. If omitted the password will be asked and read from stdin")
 	var disabled = argParse.Bool("disabled", false, "Created account is disabled")
 	var locked = argParse.Bool("locked", false, "Created account is locked")
+	var password_file = argParse.String("password-file", "", "Read password from file")
 
 	argParse.Parse(args)
 
@@ -27,6 +28,10 @@ func AddUser(r redfish.Redfish, args []string) error {
 
 	if *name == "" {
 		return errors.New("ERROR: Required options -name not found")
+	}
+
+	if *password != "" && *password_file != "" {
+		return errors.New(fmt.Sprintf("ERROR: -password and -password-file are mutually exclusive"))
 	}
 
 	// Initialize session
@@ -62,21 +67,29 @@ func AddUser(r redfish.Redfish, args []string) error {
 
 	// ask for password ?
 	if *password == "" {
-		fmt.Printf("Password for %s: ", *name)
-		raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
-		pass1 := strings.TrimSpace(string(raw_pass))
-		fmt.Println()
+		if *password_file == "" {
+			fmt.Printf("Password for %s: ", *name)
+			raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
+			pass1 := strings.TrimSpace(string(raw_pass))
+			fmt.Println()
 
-		fmt.Printf("Repeat password for %s: ", *name)
-		raw_pass, _ = terminal.ReadPassword(int(syscall.Stdin))
-		pass2 := strings.TrimSpace(string(raw_pass))
-		fmt.Println()
+			fmt.Printf("Repeat password for %s: ", *name)
+			raw_pass, _ = terminal.ReadPassword(int(syscall.Stdin))
+			pass2 := strings.TrimSpace(string(raw_pass))
+			fmt.Println()
 
-		if pass1 != pass2 {
-			return errors.New(fmt.Sprintf("ERROR: Passwords does not match for user %s", *name))
+			if pass1 != pass2 {
+				return errors.New(fmt.Sprintf("ERROR: Passwords does not match for user %s", *name))
+			}
+
+			acc.Password = pass1
+		} else {
+			passwd, err := ReadSingleLine(*password_file)
+			if err != nil {
+				return err
+			}
+			acc.Password = passwd
 		}
-
-		acc.Password = pass1
 	} else {
 		acc.Password = *password
 	}
