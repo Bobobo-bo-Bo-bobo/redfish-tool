@@ -15,7 +15,7 @@ import (
 func main() {
 	var err error
 	insecure := flag.Bool("insecure", false, "Skip SSL certificate verification")
-	verbose := flag.Bool("verbose", false, "Verbose operation")
+	debug := flag.Bool("debug", false, "Debug operation")
 	ask := flag.Bool("ask", false, "Ask for password")
 	user := flag.String("user", "", "Username to use for authentication")
 	password := flag.String("password", "", "Password to use for authentication")
@@ -73,7 +73,7 @@ func main() {
 			Username:    *user,
 			Password:    *password,
 			InsecureSSL: *insecure,
-			Verbose:     *verbose,
+			Debug:       *debug,
 			Timeout:     time.Duration(*timeout) * time.Second,
 		}
 

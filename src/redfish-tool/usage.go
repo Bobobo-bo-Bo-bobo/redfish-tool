@@ -30,8 +30,8 @@ func ShowUsage() {
 		"    	Password to use for authentication\n"+
 		"  -user=<user>\n"+
 		"    	Username to use for authentication\n"+
-		"  -verbose\n"+
-		"    	Verbose operation\n"+
+		"  -debug\n"+
+		"    	Debug operation\n"+
 		"\n"+
 		"Commands:\n"+
 		"\n"+
