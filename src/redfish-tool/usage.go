@@ -8,7 +8,7 @@ func ShowUsage() {
 	const version string = "1.0.0"
 
 	fmt.Printf("redfish-tool version %s\n"+
-		"Copyright (C) 2018 - 2019 by Andreas Maus <maus@ypbind.de>\n"+
+		"Copyright (C) 2018 by Andreas Maus <maus@ypbind.de>\n"+
 		"This program comes with ABSOLUTELY NO WARRANTY.\n"+
 		"\n"+
 		"redfish-tool is distributed under the Terms of the GNU General\n"+
@@ -28,6 +28,8 @@ func ShowUsage() {
 		"    	Skip SSL certificate verification\n"+
 		"  -password=<pass>\n"+
 		"    	Password to use for authentication\n"+
+		"  -password-file=<file>\n"+
+		"       Read password from <file> (Only the first line from the file will be used as password)\n"+
 		"  -user=<user>\n"+
 		"    	Username to use for authentication\n"+
 		"  -debug\n"+

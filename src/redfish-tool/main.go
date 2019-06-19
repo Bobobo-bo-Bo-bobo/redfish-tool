@@ -19,6 +19,7 @@ func main() {
 	ask := flag.Bool("ask", false, "Ask for password")
 	user := flag.String("user", "", "Username to use for authentication")
 	password := flag.String("password", "", "Password to use for authentication")
+	password_file := flag.String("password-file", "", "Read password from file")
 	config_file := flag.String("config", "", "Configuration file to use")
 	help := flag.Bool("help", false, "Show help text")
 	hosts := flag.String("host", "", "Hosts to work on")
@@ -43,6 +44,13 @@ func main() {
 			pass := strings.TrimSpace(string(raw_pass))
 			password = &pass
 			fmt.Println()
+		}
+		if *password_file != "" {
+			password, err = ReadSingleLine(*password_file)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Error: Unable to read password from file: %s\n", err.Error())
+				os.Exit(1)
+			}
 		}
 	}
 
