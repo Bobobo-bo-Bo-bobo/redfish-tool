@@ -154,5 +154,19 @@ func ShowUsage() {
 		"        New password. If omitted the password will be asked and read from stdin\n"+
 		"    -password-file=<file>\n"+
 		"        Read new password from <file>. The password MUST be the first line in the file, all other lines are ignored\n"+
+		"\n"+
+		"  system-power - Set power state of a system\n"+
+		"    -uuid=<uuid>\n"+
+		"       Get detailed information for system identified by UUID (*)\n"+
+		"    -id=<id>\n"+
+		"       Get detailed information for system identified by ID (*)\n"+
+		"     -state=<state>\n"+
+		"       Requested power state. The supported states varies depends on the hardware vendor"+
+		"\n"+
+		"       HPE: On, ForceOff, ForceRestart, Nmi, PushPowerButton\n"+
+		"       Huwaei: On, ForceOff, GracefulShutdown, ForceRestart, Nmi, ForcePowerCycle\n"+
+		"       Inspur: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn, PushPowerButton\n"+
+		"       Supermicro: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn\n"+
+		"\n"+
 		"\n", version)
 }

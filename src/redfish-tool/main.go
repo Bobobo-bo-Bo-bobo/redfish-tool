@@ -46,11 +46,12 @@ func main() {
 			fmt.Println()
 		}
 		if *password_file != "" {
-			password, err = ReadSingleLine(*password_file)
+			_passwd, err := ReadSingleLine(*password_file)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: Unable to read password from file: %s\n", err.Error())
 				os.Exit(1)
 			}
+			password = &_passwd
 		}
 	}
 
@@ -163,6 +164,11 @@ func main() {
 			}
 		} else if command == "passwd" {
 			err = Passwd(rf, trailing[1:])
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+			}
+		} else if command == "system-power" {
+			err = SystemPower(rf, trailing[1:])
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
 			}
