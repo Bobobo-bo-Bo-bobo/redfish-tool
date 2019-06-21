@@ -67,6 +67,6 @@ func SystemPower(r redfish.Redfish, args []string) error {
 		return errors.New("ERROR: Can't find system with requested ID/UUID")
 	}
 
-	err = r.SetSytemPowerState(sys, *state)
+	err = r.SetSystemPowerState(sys, *state)
 	return err
 }
