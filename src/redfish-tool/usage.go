@@ -5,7 +5,7 @@ import (
 )
 
 func ShowUsage() {
-	const version string = "1.0.0"
+	const version string = "1.1.0"
 
 	fmt.Printf("redfish-tool version %s\n"+
 		"Copyright (C) 2018 by Andreas Maus <maus@ypbind.de>\n"+
@@ -14,7 +14,9 @@ func ShowUsage() {
 		"redfish-tool is distributed under the Terms of the GNU General\n"+
 		"Public License Version 3. (http://www.gnu.org/copyleft/gpl.html)\n"+
 		"\n"+
-		"Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-user=<user>] <command> [<cmd_options>]\n"+
+		"Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-password-file=<file>]\n"+
+		"       -user=<user> -host=<host>[,<host>,...] [-verbose] [-timeout <sec>] [-port <port>]\n"+
+		"       [-insecure] <command> [<cmd_options>]\n"+
 		"\n"+
 		"Global options:\n"+
 		"\n"+
@@ -32,6 +34,14 @@ func ShowUsage() {
 		"       Read password from <file> (Only the first line from the file will be used as password)\n"+
 		"  -user=<user>\n"+
 		"    	Username to use for authentication\n"+
+		"  -host=<host>[,<host>,...]\n"+
+		"       Systems to connect to\n"+
+		"  -port <port>\n"+
+		"       Connect to <port>. Default: 443\n"+
+		"  -timeout <sec>\n"+
+		"       Connection timeout in seconds. Default: 60\n"+
+		"  -insecure\n"+
+		"       Don't validate SSL certificates\n"+
 		"  -debug\n"+
 		"    	Debug operation\n"+
 		"\n"+

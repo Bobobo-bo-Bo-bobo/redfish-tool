@@ -2,6 +2,7 @@
 bin
 src/golang.org
 src/git.ypbind.de
+src/github.com/
 pkg
 *.swp
 tmp/

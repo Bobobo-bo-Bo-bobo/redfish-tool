@@ -9,6 +9,7 @@ import (
 	"time"
 
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -25,6 +26,13 @@ func main() {
 	hosts := flag.String("host", "", "Hosts to work on")
 	port := flag.Int("port", 0, "Alternate port to connect to")
 	timeout := flag.Int64("timeout", 60, "Connection timeout in seconds")
+	verbose := flag.Bool("verbose", false, "Verbose operation")
+
+	// Logging setup
+	var log_fmt *log.TextFormatter = new(log.TextFormatter)
+	log_fmt.FullTimestamp = true
+	log_fmt.TimestampFormat = time.RFC3339
+	log.SetFormatter(log_fmt)
 
 	flag.Usage = ShowUsage
 	flag.Parse()
@@ -76,6 +84,12 @@ func main() {
 
 	host_list := strings.Split(*hosts, ",")
 	for _, host := range host_list {
+		if *verbose {
+			log.WithFields(log.Fields{
+				"hostname": host,
+			}).Info("Connecting to host")
+		}
+
 		rf := redfish.Redfish{
 			Hostname:    host,
 			Port:        *port,
@@ -84,96 +98,98 @@ func main() {
 			InsecureSSL: *insecure,
 			Debug:       *debug,
 			Timeout:     time.Duration(*timeout) * time.Second,
+			Verbose:     *verbose,
 		}
 
-		// XXX: optionally parse additional and command specific command lines
 		if command == "get-all-users" {
 			err = GetAllUsers(rf)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-user" {
 			err = GetUser(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-all-roles" {
 			err = GetAllRoles(rf)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-role" {
 			err = GetRole(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-all-managers" {
 			err = GetAllManagers(rf)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-manager" {
 			err = GetManager(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-all-systems" {
 			err = GetAllSystems(rf)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "get-system" {
 			err = GetSystem(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "gen-csr" {
 			err = GenCSR(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "fetch-csr" {
 			err = FetchCSR(rf)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "import-cert" {
 			err = ImportCertificate(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "reset-sp" {
 			err = ResetSP(rf)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "add-user" {
 			err = AddUser(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "del-user" {
 			err = DelUser(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "modify-user" {
 			err = ModifyUser(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "passwd" {
 			err = Passwd(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else if command == "system-power" {
 			err = SystemPower(rf, trailing[1:])
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "%s\n", err.Error())
+				log.Error(err.Error())
 			}
 		} else {
-			fmt.Fprintf(os.Stderr, "ERROR: Unknown command %s\n\n", command)
+			log.WithFields(log.Fields{
+				"command": command,
+			}).Error("Unknown command")
 			ShowUsage()
 			os.Exit(1)
 		}
