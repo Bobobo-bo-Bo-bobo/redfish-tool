@@ -5,7 +5,7 @@ import (
 )
 
 func ShowUsage() {
-	const version string = "1.1.0"
+	const version string = "1.2.0"
 
 	fmt.Printf("redfish-tool version %s\n"+
 		"Copyright (C) 2018 by Andreas Maus <maus@ypbind.de>\n"+
@@ -105,17 +105,17 @@ func ShowUsage() {
 		"   -common-name=<cn>\n"+
 		"       CSR - common name, hostname will be used if no CN is set\n"+
 		"\n"+
-		"   (*) Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
+		"   (*) DELL, Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
 		"\n"+
 		"  fetch-csr - Fetch generated certificate signing request (*)\n"+
 		"\n"+
-		"   (*) Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
+		"   (*) DELL, Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
 		"\n"+
 		"  import-cert - Import certificate in PEM format (*)\n"+
 		"    -certificate=<cert>\n"+
 		"       Certificate file in PEM format to import\n"+
 		"\n"+
-		"   (*) Inspur and Supermicro service processors do not provide endpoints for certificate import\n"+
+		"   (*) DELL, Inspur and Supermicro service processors do not provide endpoints for certificate import\n"+
 		"\n"+
 		"  reset-sp - Reset service processor\n"+
 		"\n"+
@@ -173,6 +173,7 @@ func ShowUsage() {
 		"     -state=<state>\n"+
 		"       Requested power state. The supported states varies depends on the hardware vendor"+
 		"\n"+
+		"       DELL: On, ForceOff, GracefulRestart, GracefulShutdown, PushPowerButton, Nmi\n"+
 		"       HPE: On, ForceOff, ForceRestart, Nmi, PushPowerButton\n"+
 		"       Huwaei: On, ForceOff, GracefulShutdown, ForceRestart, Nmi, ForcePowerCycle\n"+
 		"       Inspur: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn, PushPowerButton\n"+
