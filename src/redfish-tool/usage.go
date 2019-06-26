@@ -47,6 +47,12 @@ func ShowUsage() {
 		"\n"+
 		"Commands:\n"+
 		"\n"+
+		" # Account management:\n"+
+		" ## Not supported by:\n"+
+		"    * HP/HPE servers do not defined roles, but use a OEM specific privilege map\n"+
+		"    * Lenovo servers (no service endpoint provided)\n"+
+		"    * Inspur servers (service endpoint provided, but not implemented)\n"+
+		"\n"+
 		"  get-all-users - List all users from service processor\n"+
 		"\n"+
 		"  get-user - List specific user from service processor\n"+
@@ -59,65 +65,11 @@ func ShowUsage() {
 		"\n"+
 		"  get-all-roles - List all roles from service processor (*)\n"+
 		"\n"+
-		"    (*) HP/HPE servers do not defined roles\n"+
-		"        Inspur servers report AccountService endpoint but don't implement it\n"+
-		"\n"+
 		"  get-role - List sepcific role (*)\n"+
 		"    -id=<id>\n"+
-		"         Get detailed information for role identified by ID (**)\n"+
+		"         Get detailed information for role identified by ID (*)\n"+
 		"\n"+
-		"    (*) HP/HPE servers do not defined roles\n"+
-		"        Inspur servers report AccountService endpoint but don't implement it\n"+
-		"\n"+
-		"    (**) Because role names are not unique, roles can only be listed by ID\n"+
-		"\n"+
-		"  get-all-managers - List all managers\n"+
-		"\n"+
-		"  get-manager - List specific manager\n"+
-		"    -uuid=<uuid>\n"+
-		"         Get detailed information for user identified by UUID (*)\n"+
-		"    -id=<id>\n"+
-		"         Get detailed information for user identified by ID (*)\n"+
-		"\n"+
-		"    (*) -uuid and -id are mutually exclusive\n"+
-		"\n"+
-		"  get-all-systems - List all systems\n"+
-		"\n"+
-		"  get-system - List specific system\n"+
-		"    -uuid=<uuid>\n"+
-		"         Get detailed information for system identified by UUID (*)\n"+
-		"    -id=<id>\n"+
-		"         Get detailed information for system identified by ID (*)\n"+
-		"\n"+
-		"    (*) -uuid and -id are mutually exclusive\n"+
-		"\n"+
-		"  gen-csr - Generate certificate signing request (*)\n"+
-		"    -country=<c>\n"+
-		"       CSR - country\n"+
-		"    -state=<s>\n"+
-		"       CSR - state or province\n"+
-		"    -locality=<l>\n"+
-		"       CSR - locality or city\n"+
-		"   -organisation=<o>\n"+
-		"       CSR - organisation\n"+
-		"   -organisational-unit=<ou>\n"+
-		"       CSR - organisational unit\n"+
-		"   -common-name=<cn>\n"+
-		"       CSR - common name, hostname will be used if no CN is set\n"+
-		"\n"+
-		"   (*) DELL, Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
-		"\n"+
-		"  fetch-csr - Fetch generated certificate signing request (*)\n"+
-		"\n"+
-		"   (*) DELL, Inspur and Supermicro service processors do not provide endpoints for generation of certificate signing requests\n"+
-		"\n"+
-		"  import-cert - Import certificate in PEM format (*)\n"+
-		"    -certificate=<cert>\n"+
-		"       Certificate file in PEM format to import\n"+
-		"\n"+
-		"   (*) DELL, Inspur and Supermicro service processors do not provide endpoints for certificate import\n"+
-		"\n"+
-		"  reset-sp - Reset service processor\n"+
+		"    (*) Because role names are not unique, roles can only be listed by ID\n"+
 		"\n"+
 		"  add-user - Create a new user\n"+
 		"    -name=<name>\n"+
@@ -164,6 +116,64 @@ func ShowUsage() {
 		"        New password. If omitted the password will be asked and read from stdin\n"+
 		"    -password-file=<file>\n"+
 		"        Read new password from <file>. The password MUST be the first line in the file, all other lines are ignored\n"+
+
+		"\n"+
+		" # Certificate operations:\n"+
+		" ## Not supported by:\n"+
+		"    * DELL (no service endpoint provided)\n"+
+		"    * Inspur (no service endpoint provided)\n"+
+		"    * Lenovo (no service endpoint provided)\n"+
+		"    * Supermicro (no service endpoint provided)\n"+
+		"\n"+
+		"  gen-csr - Generate certificate signing request (*)\n"+
+		"    -country=<c>\n"+
+		"       CSR - country\n"+
+		"    -state=<s>\n"+
+		"       CSR - state or province\n"+
+		"    -locality=<l>\n"+
+		"       CSR - locality or city\n"+
+		"   -organisation=<o>\n"+
+		"       CSR - organisation\n"+
+		"   -organisational-unit=<ou>\n"+
+		"       CSR - organisational unit\n"+
+		"   -common-name=<cn>\n"+
+		"       CSR - common name, hostname will be used if no CN is set\n"+
+		"\n"+
+		"  fetch-csr - Fetch generated certificate signing request (*)\n"+
+		"\n"+
+		"  import-cert - Import certificate in PEM format (*)\n"+
+		"    -certificate=<cert>\n"+
+		"       Certificate file in PEM format to import\n"+
+		"\n"+
+
+		" # Service processor operations:\n"+
+		"\n"+
+		"  get-all-managers - List all managers\n"+
+		"\n"+
+		"  get-manager - List specific manager\n"+
+		"    -uuid=<uuid>\n"+
+		"         Get detailed information for user identified by UUID (*)\n"+
+		"    -id=<id>\n"+
+		"         Get detailed information for user identified by ID (*)\n"+
+		"\n"+
+		"    (*) -uuid and -id are mutually exclusive\n"+
+		"\n"+
+		"  reset-sp - Reset service processor\n"+
+		"\n"+
+
+		" # System operations:\n"+
+		"\n"+
+		"  get-all-systems - List all systems\n"+
+		"\n"+
+		"  get-system - List specific system\n"+
+		"    -uuid=<uuid>\n"+
+		"         Get detailed information for system identified by UUID (*)\n"+
+		"    -id=<id>\n"+
+		"         Get detailed information for system identified by ID (*)\n"+
+		"\n"+
+		"    (*) -uuid and -id are mutually exclusive\n"+
+		"\n"+
+
 		"\n"+
 		"  system-power - Set power state of a system\n"+
 		"    -uuid=<uuid>\n"+
@@ -177,6 +187,7 @@ func ShowUsage() {
 		"       HPE: On, ForceOff, ForceRestart, Nmi, PushPowerButton\n"+
 		"       Huwaei: On, ForceOff, GracefulShutdown, ForceRestart, Nmi, ForcePowerCycle\n"+
 		"       Inspur: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn, PushPowerButton\n"+
+		"       Lenovo: Nmi, ForceOff, ForceOn, GracefulShutdown, ForceRestart, Nmi\n"+
 		"       Supermicro: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn\n"+
 		"\n"+
 		"\n", version)
