@@ -167,9 +167,9 @@ func ShowUsage() {
 		"\n"+
 		"  system-power - Set power state of a system\n"+
 		"    -uuid=<uuid>\n"+
-		"       Get detailed information for system identified by UUID (*)\n"+
+		"       Set power state for system identified by UUID (*)\n"+
 		"    -id=<id>\n"+
-		"       Get detailed information for system identified by ID (*)\n"+
+		"       Set power state for system identified by ID (*)\n"+
 		"     -state=<state>\n"+
 		"       Requested power state. The supported states varies depends on the hardware vendor"+
 		"\n"+
@@ -178,6 +178,8 @@ func ShowUsage() {
 		"       Huwaei: On, ForceOff, GracefulShutdown, ForceRestart, Nmi, ForcePowerCycle\n"+
 		"       Inspur: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn, PushPowerButton\n"+
 		"       Supermicro: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn\n"+
+		"\n"+
+		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+
 		"\n", version)
 }
