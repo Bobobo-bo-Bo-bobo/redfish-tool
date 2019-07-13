@@ -49,9 +49,18 @@ func ShowUsage() {
 		"\n"+
 		" # Account management:\n"+
 		" ## Not supported by:\n"+
-		"    * HP/HPE servers do not defined roles, but use a OEM specific privilege map\n"+
 		"    * Lenovo servers (no service endpoint provided)\n"+
 		"    * Inspur servers (service endpoint provided, but not implemented)\n"+
+		"\n"+
+		" ## Notes:\n"+
+		" ### HP/HPE:\n"+
+		"    HP(E) iLO doesn't define roles, but use a OEM specific privilege map\n"+
+		"    List of predefined \"roles\" and their privileges:\n"+
+		"      * none: -\n"+
+		"      * readonly: login\n"+
+		"      * operator: login, remoteconsole, virtualmedia, virtualpowerandreset\n"+
+		"      * administrator: login, remoteconsole, userconfig, virtualmedia, virtualpowerandreset, iloconfig\n"+
+
 		"\n"+
 		"  get-all-users - List all users from service processor\n"+
 		"\n"+
@@ -84,6 +93,16 @@ func ShowUsage() {
 		"        Account is created but disabled\n"+
 		"    -locked\n"+
 		"        Account is created and locked\n"+
+		"    -hpe_privileges=<privilege>[,<privilege>,...]\n"+
+		"        HP(E) specific list of privileges when predefined \"roles\" (see above) are also used\n"+
+		"        the privileges are added to the privileges of the predefined \"roles\"\n"+
+		"        Supported roles:\n"+
+		"          * login\n"+
+		"          * remoteconsole\n"+
+		"          * userconfig\n"+
+		"          * virtualmedia\n"+
+		"          * virtualpowerandreset\n"+
+		"          * iloconfig\n"+
 		"\n"+
 		"  del-user - Delete an existing account\n"+
 		"    -name=<name>\n"+
@@ -116,6 +135,16 @@ func ShowUsage() {
 		"        New password. If omitted the password will be asked and read from stdin\n"+
 		"    -password-file=<file>\n"+
 		"        Read new password from <file>. The password MUST be the first line in the file, all other lines are ignored\n"+
+		"    -hpe_privileges=<privilege>[,<privilege>,...]\n"+
+		"        HP(E) specific list of privileges when predefined \"roles\" (see above) are also used\n"+
+		"        the privileges are added to the privileges of the predefined \"roles\"\n"+
+		"        Supported roles:\n"+
+		"          * login\n"+
+		"          * remoteconsole\n"+
+		"          * userconfig\n"+
+		"          * virtualmedia\n"+
+		"          * virtualpowerandreset\n"+
+		"          * iloconfig\n"+
 
 		"\n"+
 		" # Certificate operations:\n"+
@@ -148,13 +177,13 @@ func ShowUsage() {
 
 		" # Service processor operations:\n"+
 		"\n"+
-		"  get-all-managers - List all managers\n"+
+		"  get-all-managers - List all managementboards\n"+
 		"\n"+
-		"  get-manager - List specific manager\n"+
+		"  get-manager - List specific managmentboards\n"+
 		"    -uuid=<uuid>\n"+
-		"         Get detailed information for user identified by UUID (*)\n"+
+		"         Get detailed information for managementboard identified by UUID (*)\n"+
 		"    -id=<id>\n"+
-		"         Get detailed information for user identified by ID (*)\n"+
+		"         Get detailed information for managementboard identified by ID (*)\n"+
 		"\n"+
 		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+

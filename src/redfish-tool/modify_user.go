@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh/terminal"
 	"strings"
 	"syscall"
@@ -25,6 +26,8 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 	var disable = argParse.Bool("disable", false, "Disable account")
 	var lock = argParse.Bool("lock", false, "Lock account")
 	var unlock = argParse.Bool("unlock", false, "Unlock account")
+	var hpe_privileges = argParse.String("hpe-privileges", "", "List of privileges for HP(E) systems")
+	var err error
 
 	argParse.Parse(args)
 
@@ -73,7 +76,7 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 	}
 
 	// Initialize session
-	err := r.Initialise()
+	err = r.Initialise()
 	if err != nil {
 		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
 	}
@@ -97,10 +100,26 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 
 	// HP don't use or supports roles but their own privilege map
 	if r.Flavor == redfish.REDFISH_HP {
-		// FIXME: handle this!
+		if *hpe_privileges != "" {
+			acc.HPEPrivileges, err = hpeParsePrivileges(*hpe_privileges)
+			if err != nil {
+				return err
+			}
+		}
 	} else {
 		if *role != "" {
 			acc.Role = *role
+		}
+
+		if *hpe_privileges != "" {
+			log.WithFields(log.Fields{
+				"hostname":      r.Hostname,
+				"port":          r.Port,
+				"timeout":       r.Timeout,
+				"insecure_ssl":  r.InsecureSSL,
+				"flavor":        r.Flavor,
+				"flavor_string": r.FlavorString,
+			}).Warning("This is not a HP(E) system, ignoring -hpe-privileges")
 		}
 	}
 
