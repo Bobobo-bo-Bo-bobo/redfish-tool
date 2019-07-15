@@ -107,9 +107,6 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 			}
 		}
 	} else {
-		if *role != "" {
-			acc.Role = *role
-		}
 
 		if *hpe_privileges != "" {
 			log.WithFields(log.Fields{
@@ -121,6 +118,9 @@ func ModifyUser(r redfish.Redfish, args []string) error {
 				"flavor_string": r.FlavorString,
 			}).Warning("This is not a HP(E) system, ignoring -hpe-privileges")
 		}
+	}
+	if *role != "" {
+		acc.Role = *role
 	}
 
 	// ask for password ?
