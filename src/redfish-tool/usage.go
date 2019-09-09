@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
+	"runtime"
 )
 
 func ShowUsage() {
 	const version string = "1.2.0"
 
 	fmt.Printf("redfish-tool version %s\n"+
-		"Copyright (C) 2018 by Andreas Maus <maus@ypbind.de>\n"+
+		"Copyright (C) by Andreas Maus <maus@ypbind.de>\n"+
 		"This program comes with ABSOLUTELY NO WARRANTY.\n"+
 		"\n"+
 		"redfish-tool is distributed under the Terms of the GNU General\n"+
 		"Public License Version 3. (http://www.gnu.org/copyleft/gpl.html)\n"+
+		"\n"+
+		"Build with go version: %s\n"+
 		"\n"+
 		"Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-password-file=<file>]\n"+
 		"       -user=<user> -host=<host>[,<host>,...] [-verbose] [-timeout <sec>] [-port <port>]\n"+
@@ -221,5 +224,5 @@ func ShowUsage() {
 		"\n"+
 		"    (*) -uuid and -id are mutually exclusive\n"+
 		"\n"+
-		"\n", version)
+		"\n", version, runtime.Version())
 }
