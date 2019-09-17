@@ -27,6 +27,7 @@ func main() {
 	port := flag.Int("port", 0, "Alternate port to connect to")
 	timeout := flag.Int64("timeout", 60, "Connection timeout in seconds")
 	verbose := flag.Bool("verbose", false, "Verbose operation")
+	version := flag.Bool("version", false, "Show version")
 
 	// Logging setup
 	var log_fmt *log.TextFormatter = new(log.TextFormatter)
@@ -38,6 +39,11 @@ func main() {
 	flag.Parse()
 	if *help {
 		ShowUsage()
+		os.Exit(0)
+	}
+
+	if *version {
+		ShowVersion()
 		os.Exit(0)
 	}
 
