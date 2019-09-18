@@ -7,19 +7,61 @@ import (
 	redfish "git.ypbind.de/repository/go-redfish.git"
 )
 
+func compareAndSetCSRField(s *string, a *string) *string {
+	var _s string
+	var _a string
+
+	if s != nil {
+		_s = *s
+	}
+
+	if a != nil {
+		_a = *a
+	}
+
+	if _s == "" && _a != "" {
+		return a
+	} else if _s != "" && _a == "" {
+		return s
+	} else if _s != "" && _a != "" {
+		return s
+	} else {
+		// a == "" && s == ""
+		return s
+	}
+}
+
 func GenCSR(r redfish.Redfish, args []string) error {
 	var csrdata redfish.CSRData
 
 	argParse := flag.NewFlagSet("gen-csr", flag.ExitOnError)
 
 	var c = argParse.String("country", "", "CSR - country")
+	var _c = argParse.String("c", "", "CSR - country")
 	var s = argParse.String("state", "", "CSR - state or province")
+	var _s = argParse.String("s", "", "CSR - state or province")
 	var l = argParse.String("locality", "", "CSR - locality or city")
+	var _l = argParse.String("l", "", "CSR - locality or city")
 	var o = argParse.String("organisation", "", "CSR - organisation")
+	var _o = argParse.String("o", "", "CSR - organisation")
 	var ou = argParse.String("organisational-unit", "", "CSR - organisational unit")
+	var _ou = argParse.String("ou", "", "CSR - organisational unit")
 	var cn = argParse.String("common-name", "", "CSR - common name")
+	var _cn = argParse.String("cn", "", "CSR - common name")
 
 	argParse.Parse(args)
+
+	c = compareAndSetCSRField(c, _c)
+	s = compareAndSetCSRField(s, _s)
+	l = compareAndSetCSRField(l, _l)
+	o = compareAndSetCSRField(o, _o)
+	ou = compareAndSetCSRField(ou, _ou)
+	cn = compareAndSetCSRField(cn, _cn)
+
+	// at least the common-name (CN) must be set, see Issue#3
+	if *cn == "" {
+		return errors.New(fmt.Sprintf("ERROR: At least the common name must be set for CSR generation"))
+	}
 
 	// Initialize session
 	err := r.Initialise()

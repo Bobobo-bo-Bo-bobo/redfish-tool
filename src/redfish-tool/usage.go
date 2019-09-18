@@ -147,17 +147,17 @@ func ShowUsage() {
 		"    * Supermicro (no service endpoint provided)\n" +
 		"\n" +
 		"  gen-csr - Generate certificate signing request (*)\n" +
-		"    -country=<c>\n" +
+		"    -country=<c> | -c=<c>\n" +
 		"       CSR - country\n" +
-		"    -state=<s>\n" +
+		"    -state=<s> | -s=<s>\n" +
 		"       CSR - state or province\n" +
-		"    -locality=<l>\n" +
+		"    -locality=<l> | -l=<l>\n" +
 		"       CSR - locality or city\n" +
-		"   -organisation=<o>\n" +
+		"   -organisation=<o> | -o=<o>\n" +
 		"       CSR - organisation\n" +
-		"   -organisational-unit=<ou>\n" +
+		"   -organisational-unit=<ou> | -ou=<ou>\n" +
 		"       CSR - organisational unit\n" +
-		"   -common-name=<cn>\n" +
+		"   -common-name=<cn> | -cn=<cn>\n" +
 		"       CSR - common name, hostname will be used if no CN is set\n" +
 		"\n" +
 		"  fetch-csr - Fetch generated certificate signing request (*)\n" +
