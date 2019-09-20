@@ -153,11 +153,11 @@ func ShowUsage() {
 		"       CSR - state or province\n" +
 		"    -locality=<l> | -l=<l>\n" +
 		"       CSR - locality or city\n" +
-		"   -organisation=<o> | -o=<o>\n" +
+		"    -organisation=<o> | -o=<o>\n" +
 		"       CSR - organisation\n" +
-		"   -organisational-unit=<ou> | -ou=<ou>\n" +
+		"    -organisational-unit=<ou> | -ou=<ou>\n" +
 		"       CSR - organisational unit\n" +
-		"   -common-name=<cn> | -cn=<cn>\n" +
+		"    -common-name=<cn> | -cn=<cn>\n" +
 		"       CSR - common name, hostname will be used if no CN is set\n" +
 		"\n" +
 		"  fetch-csr - Fetch generated certificate signing request (*)\n" +
@@ -201,7 +201,7 @@ func ShowUsage() {
 		"       Set power state for system identified by UUID (*)\n" +
 		"    -id=<id>\n" +
 		"       Set power state for system identified by ID (*)\n" +
-		"     -state=<state>\n" +
+		"    -state=<state>\n" +
 		"       Requested power state. The supported states varies depends on the hardware vendor" +
 		"\n" +
 		"       DELL: On, ForceOff, GracefulRestart, GracefulShutdown, PushPowerButton, Nmi\n" +
