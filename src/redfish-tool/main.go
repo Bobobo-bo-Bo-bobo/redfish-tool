@@ -83,6 +83,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *user == "" || *password == "" {
+		fmt.Fprintf(os.Stderr, "Error: Missing login credentials (username and/or password)")
+		ShowUsage()
+		os.Exit(1)
+	}
+
 	if *timeout < 0 {
 		fmt.Fprintf(os.Stderr, "Error: Invalid timeout %d; must be >= 0\n\n", *timeout)
 		os.Exit(2)
