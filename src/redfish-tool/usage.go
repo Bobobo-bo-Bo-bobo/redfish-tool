@@ -213,5 +213,26 @@ func ShowUsage() {
 		"\n" +
 		"    (*) -uuid and -id are mutually exclusive\n" +
 		"\n" +
+		"# License operations:\n" +
+		"## Only supported by:\n" +
+		"    * HP/HPE\n" +
+		"\n" +
+		"  get-license\n" +
+		"    -uuid=<uuid>\n" +
+		"       Get license from management board identified by UUID (*)\n" +
+		"    -id=<id>\n" +
+		"       Get license from management board identified by ID (*)\n" +
+		"\n" +
+		"  add-license\n" +
+		"    -uuid=<uuid>\n" +
+		"       Get license from management board identified by UUID (*)\n" +
+		"    -id=<id>\n" +
+		"       Get license from management board identified by ID (*)\n" +
+		"    -license=<lic>\n" +
+		"       License key to add\n" +
+		"    -license-file=<file>\n" +
+		"       License file containing the additional license\n" +
+		"\n" +
+		"    (*) -uuid and -id are mutually exclusive\n" +
 		"\n")
 }

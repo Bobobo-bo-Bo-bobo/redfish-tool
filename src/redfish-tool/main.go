@@ -198,6 +198,16 @@ func main() {
 			if err != nil {
 				log.Error(err.Error())
 			}
+		} else if command == "get-license" {
+			err = GetLicense(rf, trailing[1:])
+			if err != nil {
+				log.Error(err.Error())
+			}
+		} else if command == "add-license" {
+			err = AddLicense(rf, trailing[1:])
+			if err != nil {
+				log.Error(err.Error())
+			}
 		} else {
 			log.WithFields(log.Fields{
 				"command": command,
