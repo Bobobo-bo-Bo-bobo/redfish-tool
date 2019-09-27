@@ -39,7 +39,11 @@ func AddLicense(r redfish.Redfish, args []string) error {
 	}
 
 	if *lf != "" {
-		ldata, err = ioutil.ReadFile(*lf)
+		if *lf == "-" {
+			ldata, err = ioutil.ReadAll(os.Stdin)
+		} else {
+			ldata, err = ioutil.ReadFile(*lf)
+		}
 		if err != nil {
 			return err
 		}

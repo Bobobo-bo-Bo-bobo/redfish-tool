@@ -6,9 +6,13 @@ import (
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
 	"io/ioutil"
+	"os"
 )
 
 func ImportCertificate(r redfish.Redfish, args []string) error {
+	var raw_pem []byte
+	var err error
+
 	argParse := flag.NewFlagSet("import-cert", flag.ExitOnError)
 
 	var pem = argParse.String("certificate", "", "Certificate file in PEM format to import")
@@ -19,7 +23,11 @@ func ImportCertificate(r redfish.Redfish, args []string) error {
 		return errors.New("ERROR: Missing mandatory parameter -certificate")
 	}
 
-	raw_pem, err := ioutil.ReadFile(*pem)
+	if *pem == "-" {
+		raw_pem, err = ioutil.ReadAll(os.Stdin)
+	} else {
+		raw_pem, err = ioutil.ReadFile(*pem)
+	}
 	if err != nil {
 		return err
 	}
