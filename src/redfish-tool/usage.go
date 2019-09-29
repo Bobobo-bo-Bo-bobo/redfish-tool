@@ -8,7 +8,7 @@ func ShowUsage() {
 	ShowVersion()
 	fmt.Printf("Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-password-file=<file>]\n" +
 		"       -user=<user> -host=<host>[,<host>,...] [-verbose] [-timeout <sec>] [-port <port>]\n" +
-		"       [-insecure] [-version] <command> [<cmd_options>]\n" +
+		"       [-insecure] [-version] [-format=<format>] <command> [<cmd_options>]\n" +
 		"\n" +
 		"Global options:\n" +
 		"\n" +
@@ -18,6 +18,12 @@ func ShowUsage() {
 		"    	Configuration file to use\n" +
 		"  -debug\n" +
 		"    	Debug operation\n" +
+		"  -format=<format>\n" +
+		"       Output format. Valid formats are:\n" +
+		"         text - Text output\n" +
+		"         json - JSON output\n" +
+		"       Default: text\n" +
+		"\n" +
 		"  -help\n" +
 		"    	Show help text\n" +
 		"  -host=<host>[,<host>,...]\n" +

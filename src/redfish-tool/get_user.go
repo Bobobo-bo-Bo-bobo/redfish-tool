@@ -1,14 +1,83 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-func GetUser(r redfish.Redfish, args []string) error {
+func printUserText(r redfish.Redfish, acc *redfish.AccountData) string {
+	var result string
+
+	result = r.Hostname + "\n"
+
+	if acc.Id != nil && *acc.Id != "" {
+		result += " Id: " + *acc.Id + "\n"
+	}
+
+	if acc.Name != nil && *acc.Name != "" {
+		result += " Name: " + *acc.Name + "\n"
+	}
+
+	if acc.UserName != nil && *acc.UserName != "" {
+		result += " UserName: " + *acc.UserName + "\n"
+	}
+
+	if acc.Password != nil && *acc.Password != "" {
+		result += " Password: " + *acc.Password + "\n"
+	}
+
+	if acc.RoleId != nil && *acc.RoleId != "" {
+		result += " RoleId: " + *acc.RoleId + "\n"
+	}
+
+	if acc.Enabled != nil {
+		if *acc.Enabled {
+			result += " Enabled: true" + "\n"
+		} else {
+			result += " Enabled: false" + "\n"
+		}
+	}
+
+	if acc.Locked != nil {
+		if *acc.Locked {
+			result += " Locked: true" + "\n"
+		} else {
+			result += " Locked: false" + "\n"
+		}
+	}
+
+	if acc.SelfEndpoint != nil {
+		result += " Endpoint: " + *acc.SelfEndpoint + "\n"
+	}
+
+	return result
+}
+
+func printUserJson(r redfish.Redfish, acc *redfish.AccountData) string {
+	var result string
+	str, err := json.Marshal(acc)
+	if err != nil {
+		log.Panic(err)
+	}
+	result = fmt.Sprintf("{\"%s\":%s}", r.Hostname, string(str))
+
+	return result
+}
+
+func printUser(r redfish.Redfish, acc *redfish.AccountData, format uint) string {
+	if format == OUTPUT_JSON {
+		return printUserJson(r, acc)
+	}
+
+	return printUserText(r, acc)
+}
+
+func GetUser(r redfish.Redfish, args []string, format uint) error {
 	var acc *redfish.AccountData
 	var found bool
 	var amap map[string]*redfish.AccountData
@@ -18,8 +87,6 @@ func GetUser(r redfish.Redfish, args []string) error {
 	var id = argParse.String("id", "", "Get detailed information for user identified by ID")
 
 	argParse.Parse(args)
-
-	fmt.Println(r.Hostname)
 
 	if *name != "" && *id != "" {
 		return errors.New("ERROR: Options -name and -id are mutually exclusive")
@@ -61,53 +128,7 @@ func GetUser(r redfish.Redfish, args []string) error {
 	}
 
 	if found {
-		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		if *id != "" {
-			fmt.Println(" " + *acc.Id)
-		} else {
-			fmt.Println(" " + *acc.UserName)
-		}
-
-		if acc.Id != nil && *acc.Id != "" {
-			fmt.Println("  Id: " + *acc.Id)
-		}
-
-		if acc.Name != nil && *acc.Name != "" {
-			fmt.Println("  Name: " + *acc.Name)
-		}
-
-		if acc.UserName != nil && *acc.UserName != "" {
-			fmt.Println("  UserName: " + *acc.UserName)
-		}
-
-		if acc.Password != nil && *acc.Password != "" {
-			fmt.Println("  Password: " + *acc.Password)
-		}
-
-		if acc.RoleId != nil && *acc.RoleId != "" {
-			fmt.Println("  RoleId: " + *acc.RoleId)
-		}
-
-		if acc.Enabled != nil {
-			if *acc.Enabled {
-				fmt.Println("  Enabled: true")
-			} else {
-				fmt.Println("  Enabled: false")
-			}
-		}
-
-		if acc.Locked != nil {
-			if *acc.Locked {
-				fmt.Println("  Locked: true")
-			} else {
-				fmt.Println("  Locked: false")
-			}
-		}
-
-		if acc.SelfEndpoint != nil {
-			fmt.Println("  Endpoint: " + *acc.SelfEndpoint)
-		}
-
+		fmt.Println(printUser(r, acc, format))
 	} else {
 		if *id != "" {
 			fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *id, r.Hostname)

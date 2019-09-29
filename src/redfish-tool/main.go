@@ -15,6 +15,8 @@ import (
 
 func main() {
 	var err error
+	var format uint = OUTPUT_TEXT
+
 	insecure := flag.Bool("insecure", false, "Skip SSL certificate verification")
 	debug := flag.Bool("debug", false, "Debug operation")
 	ask := flag.Bool("ask", false, "Ask for password")
@@ -28,6 +30,7 @@ func main() {
 	timeout := flag.Int64("timeout", 60, "Connection timeout in seconds")
 	verbose := flag.Bool("verbose", false, "Verbose operation")
 	version := flag.Bool("version", false, "Show version")
+	out_format := flag.String("format", "text", "Output format (text, JSON)")
 
 	// Logging setup
 	var log_fmt *log.TextFormatter = new(log.TextFormatter)
@@ -67,6 +70,17 @@ func main() {
 			}
 			password = &_passwd
 		}
+	}
+
+	_format := strings.ToLower(strings.TrimSpace(*out_format))
+	if _format == "text" {
+		format = OUTPUT_TEXT
+	} else if _format == "json" {
+		format = OUTPUT_JSON
+	} else {
+		fmt.Fprintf(os.Stderr, "Error: Invalid output format\n\n")
+		ShowUsage()
+		os.Exit(1)
 	}
 
 	// get requested command
@@ -114,12 +128,12 @@ func main() {
 		}
 
 		if command == "get-all-users" {
-			err = GetAllUsers(rf)
+			err = GetAllUsers(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-user" {
-			err = GetUser(rf, trailing[1:])
+			err = GetUser(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
