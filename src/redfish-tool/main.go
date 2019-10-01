@@ -138,7 +138,7 @@ func main() {
 				log.Error(err.Error())
 			}
 		} else if command == "get-all-roles" {
-			err = GetAllRoles(rf)
+			err = GetAllRoles(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
