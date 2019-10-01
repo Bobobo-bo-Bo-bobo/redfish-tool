@@ -1,14 +1,73 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-func GetManager(r redfish.Redfish, args []string) error {
+func printManagerJson(r redfish.Redfish, mgr *redfish.ManagerData) string {
+	var result string
+
+	str, err := json.Marshal(mgr)
+	if err != nil {
+		log.Panic(err)
+	}
+	result = fmt.Sprintf("{\"%s\":%s}", r.Hostname, string(str))
+
+	return result
+}
+
+func printManagerText(r redfish.Redfish, mgr *redfish.ManagerData) string {
+	var result string
+
+	if mgr.Id != nil {
+		result += " Id: " + *mgr.Id + "\n"
+	}
+	if mgr.Name != nil {
+		result += " Name:" + *mgr.Name + "\n"
+	}
+
+	if mgr.ManagerType != nil {
+		result += " ManagerType:" + *mgr.ManagerType + "\n"
+	}
+
+	if mgr.UUID != nil {
+		result += " UUID:" + *mgr.UUID + "\n"
+	}
+
+	if mgr.FirmwareVersion != nil {
+		result += " FirmwareVersion:" + *mgr.FirmwareVersion + "\n"
+	}
+
+	result += " Status: " + "\n"
+	if mgr.Status.State != nil {
+		result += "  State: " + *mgr.Status.State + "\n"
+	}
+	if mgr.Status.Health != nil {
+		result += "  Health: " + *mgr.Status.Health + "\n"
+	}
+
+	if mgr.SelfEndpoint != nil {
+		result += " Endpoint: " + *mgr.SelfEndpoint + "\n"
+	}
+
+	return result
+}
+
+func printManager(r redfish.Redfish, mgr *redfish.ManagerData, format uint) string {
+	if format == OUTPUT_JSON {
+		return printManagerJson(r, mgr)
+	}
+
+	return printManagerText(r, mgr)
+}
+
+func GetManager(r redfish.Redfish, args []string, format uint) error {
 	var mgr *redfish.ManagerData
 	var found bool
 	var mmap map[string]*redfish.ManagerData
@@ -61,44 +120,7 @@ func GetManager(r redfish.Redfish, args []string) error {
 	}
 
 	if found {
-		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		if *id != "" {
-			fmt.Println(" " + *mgr.Id)
-		} else {
-			fmt.Println(" " + *mgr.UUID)
-		}
-
-		if mgr.Id != nil {
-			fmt.Println("  Id: " + *mgr.Id)
-		}
-		if mgr.Name != nil {
-			fmt.Println("  Name:", *mgr.Name)
-		}
-
-		if mgr.ManagerType != nil {
-			fmt.Println("  ManagerType:", *mgr.ManagerType)
-		}
-
-		if mgr.UUID != nil {
-			fmt.Println("  UUID:", *mgr.UUID)
-		}
-
-		if mgr.FirmwareVersion != nil {
-			fmt.Println("  FirmwareVersion:", *mgr.FirmwareVersion)
-		}
-
-		fmt.Println("  Status: ")
-		if mgr.Status.State != nil {
-			fmt.Println("   State: " + *mgr.Status.State)
-		}
-		if mgr.Status.Health != nil {
-			fmt.Println("   Health: " + *mgr.Status.Health)
-		}
-
-		if mgr.SelfEndpoint != nil {
-			fmt.Println("  Endpoint: " + *mgr.SelfEndpoint)
-		}
-
+		fmt.Println(printManager(r, mgr, format))
 	} else {
 		if *id != "" {
 			fmt.Fprintf(os.Stderr, "User %s not found on %s\n", *id, r.Hostname)

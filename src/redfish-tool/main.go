@@ -153,7 +153,7 @@ func main() {
 				log.Error(err.Error())
 			}
 		} else if command == "get-manager" {
-			err = GetManager(rf, trailing[1:])
+			err = GetManager(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
