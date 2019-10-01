@@ -158,7 +158,7 @@ func main() {
 				log.Error(err.Error())
 			}
 		} else if command == "get-all-systems" {
-			err = GetAllSystems(rf)
+			err = GetAllSystems(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
