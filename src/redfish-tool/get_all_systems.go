@@ -11,7 +11,7 @@ import (
 func printAllSystemsText(r redfish.Redfish, smap map[string]*redfish.SystemData) string {
 	var result string
 
-	result += r.Hostname + "\n"
+	result = r.Hostname + "\n"
 	for sname, sdata := range smap {
 		result += " " + sname + "\n"
 

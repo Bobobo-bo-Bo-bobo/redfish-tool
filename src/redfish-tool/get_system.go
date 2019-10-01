@@ -1,14 +1,93 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-func GetSystem(r redfish.Redfish, args []string) error {
+func printSystemJson(r redfish.Redfish, sys *redfish.SystemData) string {
+	var result string
+
+	str, err := json.Marshal(sys)
+	// Should NEVER happen!
+	if err != nil {
+		log.Panic(err)
+	}
+
+	result += fmt.Sprintf("{\"%s\":%s}\n", r.Hostname, string(str))
+
+	return result
+}
+
+func printSystemText(r redfish.Redfish, sys *redfish.SystemData) string {
+	var result string
+
+	result = r.Hostname + "\n"
+
+	if sys.Id != nil {
+		result += "  Id:" + *sys.Id + "\n"
+	}
+
+	if sys.UUID != nil {
+		result += "  UUID:" + *sys.UUID + "\n"
+	}
+
+	if sys.Name != nil {
+		result += "  Name:" + *sys.Name + "\n"
+	}
+
+	if sys.SerialNumber != nil {
+		result += "  SerialNumber:" + *sys.SerialNumber + "\n"
+	}
+
+	if sys.Manufacturer != nil {
+		result += "  Manufacturer:" + *sys.Manufacturer + "\n"
+	}
+
+	if sys.Model != nil {
+		result += "  Model:" + *sys.Model + "\n"
+	}
+
+	result += "  Status:" + "\n"
+	if sys.Status.State != nil {
+		result += "   State: " + *sys.Status.State + "\n"
+	}
+	if sys.Status.Health != nil {
+		result += "   Health: " + *sys.Status.Health + "\n"
+	}
+	if sys.Status.HealthRollUp != nil {
+		result += "   HealthRollUp: " + *sys.Status.HealthRollUp + "\n"
+	}
+
+	if sys.PowerState != nil {
+		result += "  PowerState:" + *sys.PowerState + "\n"
+	}
+
+	if sys.BIOSVersion != nil {
+		result += "  BIOSVersion:" + *sys.BIOSVersion + "\n"
+	}
+
+	if sys.SelfEndpoint != nil {
+		result += "  SelfEndpoint:" + *sys.SelfEndpoint + "\n"
+	}
+
+	return result
+}
+
+func printSystem(r redfish.Redfish, sys *redfish.SystemData, format uint) string {
+	if format == OUTPUT_JSON {
+		return printSystemJson(r, sys)
+	}
+
+	return printSystemText(r, sys)
+}
+
+func GetSystem(r redfish.Redfish, args []string, format uint) error {
 	var sys *redfish.SystemData
 	var found bool
 	var smap map[string]*redfish.SystemData
@@ -59,60 +138,8 @@ func GetSystem(r redfish.Redfish, args []string) error {
 		sys, found = smap[*uuid]
 	}
 
-	fmt.Println(r.Hostname)
 	if found {
-		if *id != "" {
-			fmt.Println(" " + *sys.Id)
-		} else {
-			fmt.Println(" " + *sys.UUID)
-		}
-
-		if sys.Id != nil {
-			fmt.Println("  Id:", *sys.Id)
-		}
-
-		if sys.UUID != nil {
-			fmt.Println("  UUID:", *sys.UUID)
-		}
-
-		if sys.Name != nil {
-			fmt.Println("  Name:", *sys.Name)
-		}
-
-		if sys.SerialNumber != nil {
-			fmt.Println("  SerialNumber:", *sys.SerialNumber)
-		}
-
-		if sys.Manufacturer != nil {
-			fmt.Println("  Manufacturer:", *sys.Manufacturer)
-		}
-
-		if sys.Model != nil {
-			fmt.Println("  Model:", *sys.Model)
-		}
-
-		fmt.Println("  Status:")
-		if sys.Status.State != nil {
-			fmt.Println("   State: " + *sys.Status.State)
-		}
-		if sys.Status.Health != nil {
-			fmt.Println("   Health: " + *sys.Status.Health)
-		}
-		if sys.Status.HealthRollUp != nil {
-			fmt.Println("   HealthRollUp: " + *sys.Status.HealthRollUp)
-		}
-
-		if sys.PowerState != nil {
-			fmt.Println("  PowerState:", *sys.PowerState)
-		}
-
-		if sys.BIOSVersion != nil {
-			fmt.Println("  BIOSVersion:", *sys.BIOSVersion)
-		}
-
-		if sys.SelfEndpoint != nil {
-			fmt.Println("  SelfEndpoint:", *sys.SelfEndpoint)
-		}
+		fmt.Println(r, sys, format)
 	} else {
 		if *id != "" {
 			fmt.Fprintf(os.Stderr, "System %s not found on %s\n", *id, r.Hostname)

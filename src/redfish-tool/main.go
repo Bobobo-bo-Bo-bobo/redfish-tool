@@ -163,7 +163,7 @@ func main() {
 				log.Error(err.Error())
 			}
 		} else if command == "get-system" {
-			err = GetSystem(rf, trailing[1:])
+			err = GetSystem(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
