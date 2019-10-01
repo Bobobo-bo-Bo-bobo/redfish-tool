@@ -148,7 +148,7 @@ func main() {
 				log.Error(err.Error())
 			}
 		} else if command == "get-all-managers" {
-			err = GetAllManagers(rf)
+			err = GetAllManagers(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}

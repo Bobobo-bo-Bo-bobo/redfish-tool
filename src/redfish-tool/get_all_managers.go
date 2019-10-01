@@ -1,13 +1,80 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 )
 
-func GetAllManagers(r redfish.Redfish) error {
+func printAllManagersJson(r redfish.Redfish, mmap map[string]*redfish.ManagerData) string {
+	var result string
+
+	fmt.Println(r.Hostname)
+	// loop over all endpoints
+	for mname, mgr := range mmap {
+		result += " " + mname + "\n"
+		if mgr.Id != nil {
+			result += "  Id: " + *mgr.Id + "\n"
+		}
+		if mgr.Name != nil {
+			result += "  Name:" + *mgr.Name + "\n"
+		}
+
+		if mgr.ManagerType != nil {
+			result += "  ManagerType:" + *mgr.ManagerType + "\n"
+		}
+
+		if mgr.UUID != nil {
+			result += "  UUID:" + *mgr.UUID + "\n"
+		}
+
+		if mgr.FirmwareVersion != nil {
+			result += "  FirmwareVersion:" + *mgr.FirmwareVersion + "\n"
+		}
+
+		result += "  Status: " + "\n"
+		if mgr.Status.State != nil {
+			result += "   State: " + *mgr.Status.State + "\n"
+		}
+		if mgr.Status.Health != nil {
+			result += "   Health: " + *mgr.Status.Health + "\n"
+		}
+		if mgr.SelfEndpoint != nil {
+			result += "  Endpoint: " + *mgr.SelfEndpoint + "\n"
+		}
+
+	}
+
+	return result
+}
+
+func printAllManagersText(r redfish.Redfish, mmap map[string]*redfish.ManagerData) string {
+	var result string
+
+	for _, mgr := range mmap {
+		str, err := json.Marshal(mgr)
+		// Should NEVER happen!
+		if err != nil {
+			log.Panic(err)
+		}
+
+		result += fmt.Sprintf("{\"%s\":%s}\n", r.Hostname, string(str))
+	}
+
+	return result
+}
+
+func printAllManagers(r redfish.Redfish, mmap map[string]*redfish.ManagerData, format uint) string {
+	if format == OUTPUT_JSON {
+		return printAllManagersJson(r, mmap)
+	}
+
+	return printAllManagersText(r, mmap)
+}
+
+func GetAllManagers(r redfish.Redfish, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
@@ -27,43 +94,7 @@ func GetAllManagers(r redfish.Redfish) error {
 		return err
 	}
 
-	fmt.Println(r.Hostname)
-	// loop over all endpoints
-	for mname, mgr := range mmap {
-
-		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		fmt.Println(" " + mname)
-		if mgr.Id != nil {
-			fmt.Println("  Id: " + *mgr.Id)
-		}
-		if mgr.Name != nil {
-			fmt.Println("  Name:", *mgr.Name)
-		}
-
-		if mgr.ManagerType != nil {
-			fmt.Println("  ManagerType:", *mgr.ManagerType)
-		}
-
-		if mgr.UUID != nil {
-			fmt.Println("  UUID:", *mgr.UUID)
-		}
-
-		if mgr.FirmwareVersion != nil {
-			fmt.Println("  FirmwareVersion:", *mgr.FirmwareVersion)
-		}
-
-		fmt.Println("  Status: ")
-		if mgr.Status.State != nil {
-			fmt.Println("   State: " + *mgr.Status.State)
-		}
-		if mgr.Status.Health != nil {
-			fmt.Println("   Health: " + *mgr.Status.Health)
-		}
-		if mgr.SelfEndpoint != nil {
-			fmt.Println("  Endpoint: " + *mgr.SelfEndpoint)
-		}
-
-	}
+	fmt.Println(printAllManagers(r, mmap, format))
 
 	return nil
 }
