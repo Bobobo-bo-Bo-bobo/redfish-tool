@@ -1,14 +1,70 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-func GetRole(r redfish.Redfish, args []string) error {
+func printRoleJson(r redfish.Redfish, rle *redfish.RoleData) string {
+	var result string
+
+	str, err := json.Marshal(rle)
+	if err != nil {
+		log.Panic(err)
+	}
+	result = fmt.Sprintf("{\"%s\":%s}", r.Hostname, string(str))
+
+	return result
+
+}
+
+func printRoleText(r redfish.Redfish, rle *redfish.RoleData) string {
+	var result string
+
+	result = r.Hostname + "\n"
+	if rle.Id != nil && *rle.Id != "" {
+		result += " Id: " + *rle.Id + "\n"
+	}
+
+	if rle.Name != nil && *rle.Name != "" {
+		result += " Name: " + *rle.Name + "\n"
+	}
+
+	if rle.IsPredefined != nil {
+		if *rle.IsPredefined {
+			result += " IsPredefined: true" + "\n"
+		} else {
+			result += " IsPredefined: false" + "\n"
+		}
+	}
+
+	if len(rle.AssignedPrivileges) != 0 {
+		result += " Assigned privieleges" + "\n"
+		for _, p := range rle.AssignedPrivileges {
+			result += "   " + p + "\n"
+		}
+	}
+
+	if rle.SelfEndpoint != nil {
+		result += " Endpoint: " + *rle.SelfEndpoint + "\n"
+	}
+	return result
+}
+
+func printRole(r redfish.Redfish, rle *redfish.RoleData, format uint) string {
+	if format == OUTPUT_JSON {
+		return printRoleJson(r, rle)
+	}
+
+	return printRoleText(r, rle)
+}
+
+func GetRole(r redfish.Redfish, args []string, format uint) error {
 	var rle *redfish.RoleData
 	var found bool
 	var rmap map[string]*redfish.RoleData
@@ -62,35 +118,7 @@ func GetRole(r redfish.Redfish, args []string) error {
 	rle, found = rmap[*id]
 
 	if found {
-		// XXX: Allow for different output formats like JSON, YAML, ... ?
-		fmt.Println(" " + *id)
-		if rle.Id != nil && *rle.Id != "" {
-			fmt.Println("  Id: " + *rle.Id)
-		}
-
-		if rle.Name != nil && *rle.Name != "" {
-			fmt.Println("  Name: " + *rle.Name)
-		}
-
-		if rle.IsPredefined != nil {
-			if *rle.IsPredefined {
-				fmt.Println("  IsPredefined: true")
-			} else {
-				fmt.Println("  IsPredefined: false")
-			}
-		}
-
-		if len(rle.AssignedPrivileges) != 0 {
-			fmt.Println("  Assigned privieleges")
-			for _, p := range rle.AssignedPrivileges {
-				fmt.Println("   " + p)
-			}
-		}
-
-		if rle.SelfEndpoint != nil {
-			fmt.Println("  Endpoint: " + *rle.SelfEndpoint)
-		}
-
+		fmt.Println(printRole(r, rle, format))
 	} else {
 		fmt.Fprintf(os.Stderr, "Role %s not found on %s\n", *id, r.Hostname)
 	}

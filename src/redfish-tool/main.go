@@ -143,7 +143,7 @@ func main() {
 				log.Error(err.Error())
 			}
 		} else if command == "get-role" {
-			err = GetRole(rf, trailing[1:])
+			err = GetRole(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
