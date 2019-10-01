@@ -60,6 +60,7 @@ func printUserText(r redfish.Redfish, acc *redfish.AccountData) string {
 
 func printUserJson(r redfish.Redfish, acc *redfish.AccountData) string {
 	var result string
+
 	str, err := json.Marshal(acc)
 	if err != nil {
 		log.Panic(err)

@@ -30,50 +30,50 @@ func printSystemText(r redfish.Redfish, sys *redfish.SystemData) string {
 	result = r.Hostname + "\n"
 
 	if sys.Id != nil {
-		result += "  Id:" + *sys.Id + "\n"
+		result += " Id:" + *sys.Id + "\n"
 	}
 
 	if sys.UUID != nil {
-		result += "  UUID:" + *sys.UUID + "\n"
+		result += " UUID:" + *sys.UUID + "\n"
 	}
 
 	if sys.Name != nil {
-		result += "  Name:" + *sys.Name + "\n"
+		result += " Name:" + *sys.Name + "\n"
 	}
 
 	if sys.SerialNumber != nil {
-		result += "  SerialNumber:" + *sys.SerialNumber + "\n"
+		result += " SerialNumber:" + *sys.SerialNumber + "\n"
 	}
 
 	if sys.Manufacturer != nil {
-		result += "  Manufacturer:" + *sys.Manufacturer + "\n"
+		result += " Manufacturer:" + *sys.Manufacturer + "\n"
 	}
 
 	if sys.Model != nil {
-		result += "  Model:" + *sys.Model + "\n"
+		result += " Model:" + *sys.Model + "\n"
 	}
 
-	result += "  Status:" + "\n"
+	result += " Status:" + "\n"
 	if sys.Status.State != nil {
-		result += "   State: " + *sys.Status.State + "\n"
+		result += "  State: " + *sys.Status.State + "\n"
 	}
 	if sys.Status.Health != nil {
-		result += "   Health: " + *sys.Status.Health + "\n"
+		result += "  Health: " + *sys.Status.Health + "\n"
 	}
 	if sys.Status.HealthRollUp != nil {
-		result += "   HealthRollUp: " + *sys.Status.HealthRollUp + "\n"
+		result += "  HealthRollUp: " + *sys.Status.HealthRollUp + "\n"
 	}
 
 	if sys.PowerState != nil {
-		result += "  PowerState:" + *sys.PowerState + "\n"
+		result += " PowerState:" + *sys.PowerState + "\n"
 	}
 
 	if sys.BIOSVersion != nil {
-		result += "  BIOSVersion:" + *sys.BIOSVersion + "\n"
+		result += " BIOSVersion:" + *sys.BIOSVersion + "\n"
 	}
 
 	if sys.SelfEndpoint != nil {
-		result += "  SelfEndpoint:" + *sys.SelfEndpoint + "\n"
+		result += " SelfEndpoint:" + *sys.SelfEndpoint + "\n"
 	}
 
 	return result

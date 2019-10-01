@@ -25,6 +25,8 @@ func printManagerJson(r redfish.Redfish, mgr *redfish.ManagerData) string {
 func printManagerText(r redfish.Redfish, mgr *redfish.ManagerData) string {
 	var result string
 
+	result = r.Hostname + "\n"
+
 	if mgr.Id != nil {
 		result += " Id: " + *mgr.Id + "\n"
 	}
