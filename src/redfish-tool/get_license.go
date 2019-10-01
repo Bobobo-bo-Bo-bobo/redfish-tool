@@ -1,14 +1,68 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
+	log "github.com/sirupsen/logrus"
 	"os"
 )
 
-func GetLicense(r redfish.Redfish, args []string) error {
+func printLicenseJson(r redfish.Redfish, l *redfish.ManagerLicenseData) string {
+	var result string
+
+	str, err := json.Marshal(l)
+	if err != nil {
+		log.Panic(err)
+	}
+	result = fmt.Sprintf("{\"%s\":%s}", r.Hostname, string(str))
+
+	return result
+}
+
+func printLicenseText(r redfish.Redfish, l *redfish.ManagerLicenseData) string {
+	var result string
+
+	result = r.Hostname + "\n"
+
+	if l.Name != "" {
+		result += " Name: " + l.Name + "\n"
+	} else {
+		result += " Name: -" + "\n"
+	}
+
+	if l.Type != "" {
+		result += " Type: " + l.Type + "\n"
+	} else {
+		result += " Type: -" + "\n"
+	}
+
+	if l.Expiration != "" {
+		result += " Expiration: " + l.Expiration + "\n"
+	} else {
+		result += " Expiration: -" + "\n"
+	}
+
+	if l.License != "" {
+		result += " License: " + l.License + "\n"
+	} else {
+		result += " License: -" + "\n"
+	}
+
+	return result
+}
+
+func printLicense(r redfish.Redfish, l *redfish.ManagerLicenseData, format uint) string {
+	if format == OUTPUT_JSON {
+		return printLicenseJson(r, l)
+	}
+
+	return printLicenseText(r, l)
+}
+
+func GetLicense(r redfish.Redfish, args []string, format uint) error {
 	argParse := flag.NewFlagSet("get-license", flag.ExitOnError)
 	var id = argParse.String("id", "", "Management board identified by ID")
 	var uuid = argParse.String("uuid", "", "Management board identified by UUID")
@@ -75,29 +129,7 @@ func GetLicense(r redfish.Redfish, args []string) error {
 			return err
 		}
 
-		if l.Name != "" {
-			fmt.Println(" Name: " + l.Name)
-		} else {
-			fmt.Println(" Name: -")
-		}
-
-		if l.Type != "" {
-			fmt.Println(" Type: " + l.Type)
-		} else {
-			fmt.Println(" Type: -")
-		}
-
-		if l.Expiration != "" {
-			fmt.Println(" Expiration: " + l.Expiration)
-		} else {
-			fmt.Println(" Expiration: -")
-		}
-
-		if l.License != "" {
-			fmt.Println(" License: " + l.License)
-		} else {
-			fmt.Println(" License: -")
-		}
+		fmt.Println(printLicense(r, l, format))
 
 	} else {
 		if *id != "" {
