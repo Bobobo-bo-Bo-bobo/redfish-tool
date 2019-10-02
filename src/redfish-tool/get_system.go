@@ -139,7 +139,7 @@ func GetSystem(r redfish.Redfish, args []string, format uint) error {
 	}
 
 	if found {
-		fmt.Println(r, sys, format)
+		fmt.Println(printSystem(r, sys, format))
 	} else {
 		if *id != "" {
 			fmt.Fprintf(os.Stderr, "System %s not found on %s\n", *id, r.Hostname)

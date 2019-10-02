@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func printAllManagersJson(r redfish.Redfish, mmap map[string]*redfish.ManagerData) string {
+func printAllManagersText(r redfish.Redfish, mmap map[string]*redfish.ManagerData) string {
 	var result string
 
 	fmt.Println(r.Hostname)
@@ -50,7 +50,7 @@ func printAllManagersJson(r redfish.Redfish, mmap map[string]*redfish.ManagerDat
 	return result
 }
 
-func printAllManagersText(r redfish.Redfish, mmap map[string]*redfish.ManagerData) string {
+func printAllManagersJson(r redfish.Redfish, mmap map[string]*redfish.ManagerData) string {
 	var result string
 
 	for _, mgr := range mmap {

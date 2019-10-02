@@ -122,7 +122,6 @@ func GetLicense(r redfish.Redfish, args []string, format uint) error {
 		mgr, found = mmap[*uuid]
 	}
 
-	fmt.Println(r.Hostname)
 	if found {
 		l, err := r.GetLicense(mgr)
 		if err != nil {
