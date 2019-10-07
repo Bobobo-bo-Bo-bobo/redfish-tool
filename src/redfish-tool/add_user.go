@@ -40,8 +40,6 @@ func AddUser(r redfish.Redfish, args []string) error {
 
 	argParse.Parse(args)
 
-	fmt.Println(r.Hostname)
-
 	if *name == "" {
 		return errors.New("ERROR: Required options -name not found")
 	}
