@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func printSystemJson(r redfish.Redfish, sys *redfish.SystemData) string {
+func printSystemJSON(r redfish.Redfish, sys *redfish.SystemData) string {
 	var result string
 
 	str, err := json.Marshal(sys)
@@ -29,8 +29,8 @@ func printSystemText(r redfish.Redfish, sys *redfish.SystemData) string {
 
 	result = r.Hostname + "\n"
 
-	if sys.Id != nil {
-		result += " Id:" + *sys.Id + "\n"
+	if sys.ID != nil {
+		result += " Id:" + *sys.ID + "\n"
 	}
 
 	if sys.UUID != nil {
@@ -80,14 +80,14 @@ func printSystemText(r redfish.Redfish, sys *redfish.SystemData) string {
 }
 
 func printSystem(r redfish.Redfish, sys *redfish.SystemData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printSystemJson(r, sys)
+	if format == OutputJSON {
+		return printSystemJSON(r, sys)
 	}
 
 	return printSystemText(r, sys)
 }
 
-func GetSystem(r redfish.Redfish, args []string, format uint) error {
+func getSystem(r redfish.Redfish, args []string, format uint) error {
 	var sys *redfish.SystemData
 	var found bool
 	var smap map[string]*redfish.SystemData
@@ -110,22 +110,22 @@ func GetSystem(r redfish.Redfish, args []string, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
 
 	// get all systems
 	if *id != "" {
-		smap, err = r.MapSystemsById()
+		smap, err = r.MapSystemsByID()
 	} else {
-		smap, err = r.MapSystemsByUuid()
+		smap, err = r.MapSystemsByUUID()
 	}
 
 	if err != nil {

@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func printRoleJson(r redfish.Redfish, rle *redfish.RoleData) string {
+func printRoleJSON(r redfish.Redfish, rle *redfish.RoleData) string {
 	var result string
 
 	str, err := json.Marshal(rle)
@@ -27,8 +27,8 @@ func printRoleText(r redfish.Redfish, rle *redfish.RoleData) string {
 	var result string
 
 	result = r.Hostname + "\n"
-	if rle.Id != nil && *rle.Id != "" {
-		result += " Id: " + *rle.Id + "\n"
+	if rle.ID != nil && *rle.ID != "" {
+		result += " Id: " + *rle.ID + "\n"
 	}
 
 	if rle.Name != nil && *rle.Name != "" {
@@ -57,14 +57,14 @@ func printRoleText(r redfish.Redfish, rle *redfish.RoleData) string {
 }
 
 func printRole(r redfish.Redfish, rle *redfish.RoleData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printRoleJson(r, rle)
+	if format == OutputJSON {
+		return printRoleJSON(r, rle)
 	}
 
 	return printRoleText(r, rle)
 }
 
-func GetRole(r redfish.Redfish, args []string, format uint) error {
+func getRole(r redfish.Redfish, args []string, format uint) error {
 	var rle *redfish.RoleData
 	var found bool
 	var rmap map[string]*redfish.RoleData
@@ -83,13 +83,13 @@ func GetRole(r redfish.Redfish, args []string, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
@@ -102,14 +102,14 @@ func GetRole(r redfish.Redfish, args []string, format uint) error {
 
 	capa, found := redfish.VendorCapabilities[r.FlavorString]
 	if found {
-		if capa&redfish.HAS_ACCOUNT_ROLES != redfish.HAS_ACCOUNT_ROLES {
+		if capa&redfish.HasAccountRoles != redfish.HasAccountRoles {
 			fmt.Println(r.Hostname)
 			return errors.New("Vendor does not support roles")
 		}
 	}
 
 	// get all roles
-	rmap, err = r.MapRolesById()
+	rmap, err = r.MapRolesByID()
 
 	if err != nil {
 		return err

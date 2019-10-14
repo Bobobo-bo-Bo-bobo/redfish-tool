@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func AddLicense(r redfish.Redfish, args []string) error {
+func addLicense(r redfish.Redfish, args []string) error {
 	argParse := flag.NewFlagSet("add-license", flag.ExitOnError)
 	var id = argParse.String("id", "", "Management board identified by ID")
 	var uuid = argParse.String("uuid", "", "Management board identified by UUID")
@@ -55,13 +55,13 @@ func AddLicense(r redfish.Redfish, args []string) error {
 	// Initialize session
 	err = r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
@@ -73,16 +73,16 @@ func AddLicense(r redfish.Redfish, args []string) error {
 
 	capa, found := redfish.VendorCapabilities[r.FlavorString]
 	if found {
-		if capa&redfish.HAS_LICENSE != redfish.HAS_LICENSE {
+		if capa&redfish.HasLicense != redfish.HasLicense {
 			fmt.Println(r.Hostname)
 			return errors.New("Vendor does not support license operations")
 		}
 	}
 
 	if *id != "" {
-		mmap, err = r.MapManagersById()
+		mmap, err = r.MapManagersByID()
 	} else if *uuid != "" {
-		mmap, err = r.MapManagersByUuid()
+		mmap, err = r.MapManagersByUUID()
 	}
 
 	if err != nil {

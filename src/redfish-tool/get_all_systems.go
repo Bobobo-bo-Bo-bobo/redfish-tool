@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
 	log "github.com/sirupsen/logrus"
@@ -15,8 +14,8 @@ func printAllSystemsText(r redfish.Redfish, smap map[string]*redfish.SystemData)
 	for sname, sdata := range smap {
 		result += " " + sname + "\n"
 
-		if sdata.Id != nil {
-			result += "  Id:" + *sdata.Id + "\n"
+		if sdata.ID != nil {
+			result += "  Id:" + *sdata.ID + "\n"
 		}
 
 		if sdata.UUID != nil {
@@ -66,7 +65,7 @@ func printAllSystemsText(r redfish.Redfish, smap map[string]*redfish.SystemData)
 	return result
 }
 
-func printAllSystemsJson(r redfish.Redfish, smap map[string]*redfish.SystemData) string {
+func printAllSystemsJSON(r redfish.Redfish, smap map[string]*redfish.SystemData) string {
 	var result string
 
 	for _, sdata := range smap {
@@ -84,29 +83,29 @@ func printAllSystemsJson(r redfish.Redfish, smap map[string]*redfish.SystemData)
 }
 
 func printAllSystems(r redfish.Redfish, smap map[string]*redfish.SystemData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printAllSystemsJson(r, smap)
+	if format == OutputJSON {
+		return printAllSystemsJSON(r, smap)
 	}
 	return printAllSystemsText(r, smap)
 }
 
-func GetAllSystems(r redfish.Redfish, format uint) error {
+func getAllSystems(r redfish.Redfish, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
 
 	// get all systems
-	smap, err := r.MapSystemsById()
+	smap, err := r.MapSystemsByID()
 	if err != nil {
 		return err
 	}

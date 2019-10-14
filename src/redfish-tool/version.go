@@ -6,7 +6,7 @@ import (
 	"runtime"
 )
 
-func ShowVersion() {
+func showVersion() {
 
 	fmt.Printf("redfish-tool version %s\n"+
 		"Copyright (C) by Andreas Maus <maus@ypbind.de>\n"+

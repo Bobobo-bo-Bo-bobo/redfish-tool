@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	redfish "git.ypbind.de/repository/go-redfish.git"
 	log "github.com/sirupsen/logrus"
@@ -18,8 +17,8 @@ func printAllUsersText(r redfish.Redfish, amap map[string]*redfish.AccountData) 
 
 		result += " " + aname + "\n"
 
-		if acc.Id != nil && *acc.Id != "" {
-			result += "  Id: " + *acc.Id + "\n"
+		if acc.ID != nil && *acc.ID != "" {
+			result += "  Id: " + *acc.ID + "\n"
 		}
 
 		if acc.Name != nil && *acc.Name != "" {
@@ -34,8 +33,8 @@ func printAllUsersText(r redfish.Redfish, amap map[string]*redfish.AccountData) 
 			result += "  Password: " + *acc.Password + "\n"
 		}
 
-		if acc.RoleId != nil && *acc.RoleId != "" {
-			result += "  RoleId: " + *acc.RoleId + "\n"
+		if acc.RoleID != nil && *acc.RoleID != "" {
+			result += "  RoleId: " + *acc.RoleID + "\n"
 		}
 
 		if acc.Enabled != nil {
@@ -61,7 +60,7 @@ func printAllUsersText(r redfish.Redfish, amap map[string]*redfish.AccountData) 
 	return result
 }
 
-func printAllUsersJson(r redfish.Redfish, amap map[string]*redfish.AccountData) string {
+func printAllUsersJSON(r redfish.Redfish, amap map[string]*redfish.AccountData) string {
 	var result string
 
 	for _, acc := range amap {
@@ -78,23 +77,23 @@ func printAllUsersJson(r redfish.Redfish, amap map[string]*redfish.AccountData) 
 }
 
 func printAllUsers(r redfish.Redfish, amap map[string]*redfish.AccountData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printAllUsersJson(r, amap)
+	if format == OutputJSON {
+		return printAllUsersJSON(r, amap)
 	}
 	return printAllUsersText(r, amap)
 }
 
-func GetAllUsers(r redfish.Redfish, format uint) error {
+func getAllUsers(r redfish.Redfish, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()

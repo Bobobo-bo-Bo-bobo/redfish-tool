@@ -9,8 +9,8 @@ import (
 	"os"
 )
 
-func ImportCertificate(r redfish.Redfish, args []string) error {
-	var raw_pem []byte
+func importCertificate(r redfish.Redfish, args []string) error {
+	var rawPem []byte
 	var err error
 
 	argParse := flag.NewFlagSet("import-cert", flag.ExitOnError)
@@ -24,9 +24,9 @@ func ImportCertificate(r redfish.Redfish, args []string) error {
 	}
 
 	if *pem == "-" {
-		raw_pem, err = ioutil.ReadAll(os.Stdin)
+		rawPem, err = ioutil.ReadAll(os.Stdin)
 	} else {
-		raw_pem, err = ioutil.ReadFile(*pem)
+		rawPem, err = ioutil.ReadFile(*pem)
 	}
 	if err != nil {
 		return err
@@ -35,13 +35,13 @@ func ImportCertificate(r redfish.Redfish, args []string) error {
 	// Initialize session
 	err = r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
@@ -54,13 +54,13 @@ func ImportCertificate(r redfish.Redfish, args []string) error {
 
 	capa, found := redfish.VendorCapabilities[r.FlavorString]
 	if found {
-		if capa&redfish.HAS_SECURITYSERVICE != redfish.HAS_SECURITYSERVICE {
+		if capa&redfish.HasSecurityService != redfish.HasSecurityService {
 			fmt.Println(r.Hostname)
 			return errors.New("Vendor does not support certificate import")
 		}
 	}
 
-	err = r.ImportCertificate(string(raw_pem))
+	err = r.ImportCertificate(string(rawPem))
 	if err != nil {
 		return err
 	}

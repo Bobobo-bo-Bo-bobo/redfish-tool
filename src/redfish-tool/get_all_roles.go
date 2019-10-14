@@ -8,7 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func printAllRolesJson(r redfish.Redfish, rmap map[string]*redfish.RoleData) string {
+func printAllRolesJSON(r redfish.Redfish, rmap map[string]*redfish.RoleData) string {
 	var result string
 
 	for _, rle := range rmap {
@@ -32,8 +32,8 @@ func printAllRolesText(r redfish.Redfish, rmap map[string]*redfish.RoleData) str
 	// loop over all endpoints
 	for rid, rle := range rmap {
 		result += " " + rid + "\n"
-		if rle.Id != nil && *rle.Id != "" {
-			result += "  Id: " + *rle.Id + "\n"
+		if rle.ID != nil && *rle.ID != "" {
+			result += "  Id: " + *rle.ID + "\n"
 		}
 
 		if rle.Name != nil && *rle.Name != "" {
@@ -63,24 +63,24 @@ func printAllRolesText(r redfish.Redfish, rmap map[string]*redfish.RoleData) str
 }
 
 func printAllRoles(r redfish.Redfish, rmap map[string]*redfish.RoleData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printAllRolesJson(r, rmap)
+	if format == OutputJSON {
+		return printAllRolesJSON(r, rmap)
 	}
 
 	return printAllRolesText(r, rmap)
 }
 
-func GetAllRoles(r redfish.Redfish, format uint) error {
+func getAllRoles(r redfish.Redfish, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
@@ -93,14 +93,14 @@ func GetAllRoles(r redfish.Redfish, format uint) error {
 
 	capa, found := redfish.VendorCapabilities[r.FlavorString]
 	if found {
-		if capa&redfish.HAS_ACCOUNT_ROLES != redfish.HAS_ACCOUNT_ROLES {
+		if capa&redfish.HasAccountRoles != redfish.HasAccountRoles {
 			fmt.Println(r.Hostname)
 			return errors.New("Vendor does not support roles")
 		}
 	}
 
 	// get all role endpoints - Note: role names are _NOT_ unique but IDs are!
-	rmap, err := r.MapRolesById()
+	rmap, err := r.MapRolesByID()
 	if err != nil {
 		return err
 	}

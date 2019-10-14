@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-func printManagerJson(r redfish.Redfish, mgr *redfish.ManagerData) string {
+func printManagerJSON(r redfish.Redfish, mgr *redfish.ManagerData) string {
 	var result string
 
 	str, err := json.Marshal(mgr)
@@ -27,8 +27,8 @@ func printManagerText(r redfish.Redfish, mgr *redfish.ManagerData) string {
 
 	result = r.Hostname + "\n"
 
-	if mgr.Id != nil {
-		result += " Id: " + *mgr.Id + "\n"
+	if mgr.ID != nil {
+		result += " Id: " + *mgr.ID + "\n"
 	}
 	if mgr.Name != nil {
 		result += " Name:" + *mgr.Name + "\n"
@@ -62,14 +62,14 @@ func printManagerText(r redfish.Redfish, mgr *redfish.ManagerData) string {
 }
 
 func printManager(r redfish.Redfish, mgr *redfish.ManagerData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printManagerJson(r, mgr)
+	if format == OutputJSON {
+		return printManagerJSON(r, mgr)
 	}
 
 	return printManagerText(r, mgr)
 }
 
-func GetManager(r redfish.Redfish, args []string, format uint) error {
+func getManager(r redfish.Redfish, args []string, format uint) error {
 	var mgr *redfish.ManagerData
 	var found bool
 	var mmap map[string]*redfish.ManagerData
@@ -91,22 +91,22 @@ func GetManager(r redfish.Redfish, args []string, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
 
 	// get all account endpoints
 	if *id != "" {
-		mmap, err = r.MapManagersById()
+		mmap, err = r.MapManagersByID()
 	} else {
-		mmap, err = r.MapManagersByUuid()
+		mmap, err = r.MapManagersByUUID()
 	}
 
 	if err != nil {

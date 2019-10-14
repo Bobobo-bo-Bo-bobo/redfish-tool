@@ -15,8 +15,8 @@ func printUserText(r redfish.Redfish, acc *redfish.AccountData) string {
 
 	result = r.Hostname + "\n"
 
-	if acc.Id != nil && *acc.Id != "" {
-		result += " Id: " + *acc.Id + "\n"
+	if acc.ID != nil && *acc.ID != "" {
+		result += " Id: " + *acc.ID + "\n"
 	}
 
 	if acc.Name != nil && *acc.Name != "" {
@@ -31,8 +31,8 @@ func printUserText(r redfish.Redfish, acc *redfish.AccountData) string {
 		result += " Password: " + *acc.Password + "\n"
 	}
 
-	if acc.RoleId != nil && *acc.RoleId != "" {
-		result += " RoleId: " + *acc.RoleId + "\n"
+	if acc.RoleID != nil && *acc.RoleID != "" {
+		result += " RoleId: " + *acc.RoleID + "\n"
 	}
 
 	if acc.Enabled != nil {
@@ -58,7 +58,7 @@ func printUserText(r redfish.Redfish, acc *redfish.AccountData) string {
 	return result
 }
 
-func printUserJson(r redfish.Redfish, acc *redfish.AccountData) string {
+func printUserJSON(r redfish.Redfish, acc *redfish.AccountData) string {
 	var result string
 
 	str, err := json.Marshal(acc)
@@ -71,14 +71,14 @@ func printUserJson(r redfish.Redfish, acc *redfish.AccountData) string {
 }
 
 func printUser(r redfish.Redfish, acc *redfish.AccountData, format uint) string {
-	if format == OUTPUT_JSON {
-		return printUserJson(r, acc)
+	if format == OutputJSON {
+		return printUserJSON(r, acc)
 	}
 
 	return printUserText(r, acc)
 }
 
-func GetUser(r redfish.Redfish, args []string, format uint) error {
+func getUser(r redfish.Redfish, args []string, format uint) error {
 	var acc *redfish.AccountData
 	var found bool
 	var amap map[string]*redfish.AccountData
@@ -100,20 +100,20 @@ func GetUser(r redfish.Redfish, args []string, format uint) error {
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
 
 	// get all account endpoints
 	if *id != "" {
-		amap, err = r.MapAccountsById()
+		amap, err = r.MapAccountsByID()
 	} else {
 		amap, err = r.MapAccountsByName()
 	}

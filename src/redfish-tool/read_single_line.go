@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func ReadSingleLine(f string) (string, error) {
+func readSingleLine(f string) (string, error) {
 	var line string
 	var fd *os.File
 	var err error
@@ -28,9 +28,8 @@ func ReadSingleLine(f string) (string, error) {
 	if line == "" {
 		if f == "-" {
 			return line, errors.New("ERROR: Empty password read from stdin")
-		} else {
-			return line, errors.New(fmt.Sprintf("ERROR: Empty password read from file %s", f))
 		}
+		return line, fmt.Errorf("ERROR: Empty password read from file %s", f)
 	}
 
 	return line, nil

@@ -12,31 +12,31 @@ import (
 )
 
 func hpeParsePrivileges(privileges string) (uint, error) {
-	var result uint = 0
+	var result uint
 
 	for _, priv := range strings.Split(strings.ToLower(privileges), ",") {
 		_priv := strings.TrimSpace(priv)
 		_bit, found := redfish.HPEPrivilegeMap[_priv]
 		if !found {
-			return 0, errors.New(fmt.Sprintf("ERROR: Unknown privilege %s", _priv))
+			return 0, fmt.Errorf("ERROR: Unknown privilege %s", _priv)
 		}
 		result |= _bit
 	}
 	return result, nil
 }
 
-func AddUser(r redfish.Redfish, args []string) error {
+func addUser(r redfish.Redfish, args []string) error {
 	var acc redfish.AccountCreateData
 
 	argParse := flag.NewFlagSet("add-user", flag.ExitOnError)
 
 	var name = argParse.String("name", "", "Name of user account to create")
 	var role = argParse.String("role", "", "Role of user account to create")
-	var hpe_privileges = argParse.String("hpe-privileges", "", "List of privileges for HP(E) systems")
+	var hpePrivileges = argParse.String("hpe-privileges", "", "List of privileges for HP(E) systems")
 	var password = argParse.String("password", "", "Password for new user account. If omitted the password will be asked and read from stdin")
 	var disabled = argParse.Bool("disabled", false, "Created account is disabled")
 	var locked = argParse.Bool("locked", false, "Created account is locked")
-	var password_file = argParse.String("password-file", "", "Read password from file")
+	var passwordFile = argParse.String("password-file", "", "Read password from file")
 
 	argParse.Parse(args)
 
@@ -44,20 +44,20 @@ func AddUser(r redfish.Redfish, args []string) error {
 		return errors.New("ERROR: Required options -name not found")
 	}
 
-	if *password != "" && *password_file != "" {
-		return errors.New(fmt.Sprintf("ERROR: -password and -password-file are mutually exclusive"))
+	if *password != "" && *passwordFile != "" {
+		return fmt.Errorf("ERROR: -password and -password-file are mutually exclusive")
 	}
 
 	// Initialize session
 	err := r.Initialise()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Initialisation failed for %s: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Initialisation failed for %s: %s", r.Hostname, err.Error())
 	}
 
 	// Login
 	err = r.Login()
 	if err != nil {
-		return errors.New(fmt.Sprintf("ERROR: Login to %s failed: %s\n", r.Hostname, err.Error()))
+		return fmt.Errorf("ERROR: Login to %s failed: %s", r.Hostname, err.Error())
 	}
 
 	defer r.Logout()
@@ -70,9 +70,9 @@ func AddUser(r redfish.Redfish, args []string) error {
 	acc.UserName = *name
 
 	// HP don't use or supports roles but their own privilege map
-	if r.Flavor == redfish.REDFISH_HP {
-		if *hpe_privileges != "" {
-			acc.HPEPrivileges, err = hpeParsePrivileges(*hpe_privileges)
+	if r.Flavor == redfish.RedfishHP {
+		if *hpePrivileges != "" {
+			acc.HPEPrivileges, err = hpeParsePrivileges(*hpePrivileges)
 			if err != nil {
 				return err
 			}
@@ -81,7 +81,7 @@ func AddUser(r redfish.Redfish, args []string) error {
 		if *role == "" {
 			return errors.New("ERROR: Required option -role not found")
 		}
-		if *hpe_privileges != "" {
+		if *hpePrivileges != "" {
 			log.WithFields(log.Fields{
 				"hostname":      r.Hostname,
 				"port":          r.Port,
@@ -97,24 +97,24 @@ func AddUser(r redfish.Redfish, args []string) error {
 
 	// ask for password ?
 	if *password == "" {
-		if *password_file == "" {
+		if *passwordFile == "" {
 			fmt.Printf("Password for %s: ", *name)
-			raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
-			pass1 := strings.TrimSpace(string(raw_pass))
+			rawPass, _ := terminal.ReadPassword(int(syscall.Stdin))
+			pass1 := strings.TrimSpace(string(rawPass))
 			fmt.Println()
 
 			fmt.Printf("Repeat password for %s: ", *name)
-			raw_pass, _ = terminal.ReadPassword(int(syscall.Stdin))
-			pass2 := strings.TrimSpace(string(raw_pass))
+			rawPass, _ = terminal.ReadPassword(int(syscall.Stdin))
+			pass2 := strings.TrimSpace(string(rawPass))
 			fmt.Println()
 
 			if pass1 != pass2 {
-				return errors.New(fmt.Sprintf("ERROR: Passwords does not match for user %s", *name))
+				return fmt.Errorf("ERROR: Passwords does not match for user %s", *name)
 			}
 
 			acc.Password = pass1
 		} else {
-			passwd, err := ReadSingleLine(*password_file)
+			passwd, err := readSingleLine(*passwordFile)
 			if err != nil {
 				return err
 			}

@@ -15,55 +15,55 @@ import (
 
 func main() {
 	var err error
-	var format uint = OUTPUT_TEXT
+	var format = OutputText
 
 	insecure := flag.Bool("insecure", false, "Skip SSL certificate verification")
 	debug := flag.Bool("debug", false, "Debug operation")
 	ask := flag.Bool("ask", false, "Ask for password")
 	user := flag.String("user", "", "Username to use for authentication")
 	password := flag.String("password", "", "Password to use for authentication")
-	password_file := flag.String("password-file", "", "Read password from file")
-	config_file := flag.String("config", "", "Configuration file to use")
+	passwordFile := flag.String("password-file", "", "Read password from file")
+	configFile := flag.String("config", "", "Configuration file to use")
 	help := flag.Bool("help", false, "Show help text")
 	hosts := flag.String("host", "", "Hosts to work on")
 	port := flag.Int("port", 0, "Alternate port to connect to")
 	timeout := flag.Int64("timeout", 60, "Connection timeout in seconds")
 	verbose := flag.Bool("verbose", false, "Verbose operation")
 	version := flag.Bool("version", false, "Show version")
-	out_format := flag.String("format", "text", "Output format (text, JSON)")
+	outFormat := flag.String("format", "text", "Output format (text, JSON)")
 
 	// Logging setup
-	var log_fmt *log.TextFormatter = new(log.TextFormatter)
-	log_fmt.FullTimestamp = true
-	log_fmt.TimestampFormat = time.RFC3339
-	log.SetFormatter(log_fmt)
+	var logFmt = new(log.TextFormatter)
+	logFmt.FullTimestamp = true
+	logFmt.TimestampFormat = time.RFC3339
+	log.SetFormatter(logFmt)
 
-	flag.Usage = ShowUsage
+	flag.Usage = showUsage
 	flag.Parse()
 	if *help {
-		ShowUsage()
+		showUsage()
 		os.Exit(0)
 	}
 
 	if *version {
-		ShowVersion()
+		showVersion()
 		os.Exit(0)
 	}
 
 	trailing := flag.Args()
 
-	if *config_file != "" {
+	if *configFile != "" {
 		// read and parse configuration file
 	} else {
 		if *ask {
 			fmt.Print("Password: ")
-			raw_pass, _ := terminal.ReadPassword(int(syscall.Stdin))
-			pass := strings.TrimSpace(string(raw_pass))
+			rawPass, _ := terminal.ReadPassword(int(syscall.Stdin))
+			pass := strings.TrimSpace(string(rawPass))
 			password = &pass
 			fmt.Println()
 		}
-		if *password_file != "" {
-			_passwd, err := ReadSingleLine(*password_file)
+		if *passwordFile != "" {
+			_passwd, err := readSingleLine(*passwordFile)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Error: Unable to read password from file: %s\n", err.Error())
 				os.Exit(1)
@@ -72,34 +72,34 @@ func main() {
 		}
 	}
 
-	_format := strings.ToLower(strings.TrimSpace(*out_format))
+	_format := strings.ToLower(strings.TrimSpace(*outFormat))
 	if _format == "text" {
-		format = OUTPUT_TEXT
+		format = OutputText
 	} else if _format == "json" {
-		format = OUTPUT_JSON
+		format = OutputJSON
 	} else {
 		fmt.Fprintf(os.Stderr, "Error: Invalid output format\n\n")
-		ShowUsage()
+		showUsage()
 		os.Exit(1)
 	}
 
 	// get requested command
 	if len(trailing) == 0 {
 		fmt.Fprintf(os.Stderr, "Error: No command defined\n\n")
-		ShowUsage()
+		showUsage()
 		os.Exit(1)
 	}
 	command := strings.ToLower(trailing[0])
 
 	if *hosts == "" {
 		fmt.Fprintf(os.Stderr, "Error: No destination host given\n\n")
-		ShowUsage()
+		showUsage()
 		os.Exit(1)
 	}
 
 	if *user == "" || *password == "" {
 		fmt.Fprintf(os.Stderr, "Error: Missing login credentials (username and/or password)")
-		ShowUsage()
+		showUsage()
 		os.Exit(1)
 	}
 
@@ -108,8 +108,8 @@ func main() {
 		os.Exit(2)
 	}
 
-	host_list := strings.Split(*hosts, ",")
-	for _, host := range host_list {
+	hostList := strings.Split(*hosts, ",")
+	for _, host := range hostList {
 		if *verbose {
 			log.WithFields(log.Fields{
 				"hostname": host,
@@ -128,97 +128,97 @@ func main() {
 		}
 
 		if command == "get-all-users" {
-			err = GetAllUsers(rf, format)
+			err = getAllUsers(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-user" {
-			err = GetUser(rf, trailing[1:], format)
+			err = getUser(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-all-roles" {
-			err = GetAllRoles(rf, format)
+			err = getAllRoles(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-role" {
-			err = GetRole(rf, trailing[1:], format)
+			err = getRole(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-all-managers" {
-			err = GetAllManagers(rf, format)
+			err = getAllManagers(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-manager" {
-			err = GetManager(rf, trailing[1:], format)
+			err = getManager(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-all-systems" {
-			err = GetAllSystems(rf, format)
+			err = getAllSystems(rf, format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-system" {
-			err = GetSystem(rf, trailing[1:], format)
+			err = getSystem(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "gen-csr" {
-			err = GenCSR(rf, trailing[1:])
+			err = genCSR(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "fetch-csr" {
-			err = FetchCSR(rf)
+			err = fetchCSR(rf)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "import-cert" {
-			err = ImportCertificate(rf, trailing[1:])
+			err = importCertificate(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "reset-sp" {
-			err = ResetSP(rf)
+			err = resetSP(rf)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "add-user" {
-			err = AddUser(rf, trailing[1:])
+			err = addUser(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "del-user" {
-			err = DelUser(rf, trailing[1:])
+			err = delUser(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "modify-user" {
-			err = ModifyUser(rf, trailing[1:])
+			err = modifyUser(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "passwd" {
-			err = Passwd(rf, trailing[1:])
+			err = passwd(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "system-power" {
-			err = SystemPower(rf, trailing[1:])
+			err = systemPower(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "get-license" {
-			err = GetLicense(rf, trailing[1:], format)
+			err = getLicense(rf, trailing[1:], format)
 			if err != nil {
 				log.Error(err.Error())
 			}
 		} else if command == "add-license" {
-			err = AddLicense(rf, trailing[1:])
+			err = addLicense(rf, trailing[1:])
 			if err != nil {
 				log.Error(err.Error())
 			}
@@ -226,7 +226,7 @@ func main() {
 			log.WithFields(log.Fields{
 				"command": command,
 			}).Error("Unknown command")
-			ShowUsage()
+			showUsage()
 			os.Exit(1)
 		}
 	}
