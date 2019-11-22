@@ -58,7 +58,7 @@ func main() {
 		if *ask {
 			fmt.Print("Password: ")
 			rawPass, _ := terminal.ReadPassword(int(syscall.Stdin))
-			pass := strings.TrimSpace(string(rawPass))
+			pass := strings.Replace(strings.Replace(strings.Replace(string(rawPass), "\r", "", -1), "\n", "", -1), "\t", "", -1)
 			password = &pass
 			fmt.Println()
 		}

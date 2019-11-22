@@ -1,7 +1,7 @@
 package main
 
 // Note: Be consistent with "Semantic Versioning 2.0.0" - see https://semver.org/
-const version string = "1.2.0-2019.10.14"
+const version string = "1.2.0-2019.11.22"
 const (
 	// OutputText - output as normal text format
 	OutputText uint = iota

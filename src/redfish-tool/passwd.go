@@ -54,12 +54,12 @@ func passwd(r redfish.Redfish, args []string) error {
 			fmt.Printf("Password for %s: ", *name)
 			rawPass, _ := terminal.ReadPassword(int(syscall.Stdin))
 			fmt.Println()
-			pass1 := strings.TrimSpace(string(rawPass))
+			pass1 := strings.Replace(strings.Replace(strings.Replace(string(rawPass), "\r", "", -1), "\n", "", -1), "\t", "", -1)
 
 			fmt.Printf("Repeat password for %s: ", *name)
 			rawPass, _ = terminal.ReadPassword(int(syscall.Stdin))
 			fmt.Println()
-			pass2 := strings.TrimSpace(string(rawPass))
+			pass2 := strings.Replace(strings.Replace(strings.Replace(string(rawPass), "\r", "", -1), "\n", "", -1), "\t", "", -1)
 
 			if pass1 != pass2 {
 				return fmt.Errorf("ERROR: Passwords does not match for user %s", *name)

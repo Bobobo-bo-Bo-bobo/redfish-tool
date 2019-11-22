@@ -100,12 +100,12 @@ func addUser(r redfish.Redfish, args []string) error {
 		if *passwordFile == "" {
 			fmt.Printf("Password for %s: ", *name)
 			rawPass, _ := terminal.ReadPassword(int(syscall.Stdin))
-			pass1 := strings.TrimSpace(string(rawPass))
+			pass1 := strings.Replace(strings.Replace(strings.Replace(string(rawPass), "\r", "", -1), "\n", "", -1), "\t", "", -1)
 			fmt.Println()
 
 			fmt.Printf("Repeat password for %s: ", *name)
 			rawPass, _ = terminal.ReadPassword(int(syscall.Stdin))
-			pass2 := strings.TrimSpace(string(rawPass))
+			pass2 := strings.Replace(strings.Replace(strings.Replace(string(rawPass), "\r", "", -1), "\n", "", -1), "\t", "", -1)
 			fmt.Println()
 
 			if pass1 != pass2 {
