@@ -23,5 +23,15 @@ clean:
 uninstall:
 	/bin/rm -f $(DESTDIR)/usr/bin
 
+depend:
+	env GOPATH=$(GOPATH) go get -u github.com/sirupsen/logrus/
+	env GOPATH=$(GOPATH) go get -u git.ypbind.de/repository/go-redfish.git/
+	env GOPATH=$(GOPATH) go get -u golang.org/x/crypto/ssh/terminal
+
+distclean:
+	/bin/rm -rf src/github.com/
+	/bin/rm -rf src/git.ypbind.de/
+	/bin/rm -rf src/golang.org/
+
 all: build strip install
 
