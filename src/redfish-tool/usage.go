@@ -91,7 +91,7 @@ func showUsage() {
 		"        Account is created but disabled\n" +
 		"    -locked\n" +
 		"        Account is created and locked\n" +
-		"    -hpe_privileges=<privilege>[,<privilege>,...]\n" +
+		"    -hpe-privileges=<privilege>[,<privilege>,...]\n" +
 		"        HP(E) specific list of privileges when predefined \"roles\" (see above) are also used\n" +
 		"        the privileges are added to the privileges of the predefined \"roles\"\n" +
 		"        Supported roles:\n" +
