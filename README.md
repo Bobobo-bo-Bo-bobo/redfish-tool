@@ -1,3 +1,7 @@
+**_Note:_** Because I'm running my own servers for serveral years, main development is done at at https://git.ypbind.de/cgit/redfish-tool/
+
+----
+
 # Preface
 The [Redfish REST API](https://redfish.dmtf.org/) defines a de-facto standard for a defined access
 to the management boards and information / operation on servers.
