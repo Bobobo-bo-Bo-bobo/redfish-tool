@@ -38,6 +38,8 @@ func showUsage() {
 		"    	Username to use for authentication\n" +
 		"  -timeout <sec>\n" +
 		"       Connection timeout in seconds. Default: 60\n" +
+		"  -verbose\n" +
+		"       Vebose operation\n" +
 		"  -version\n" +
 		"       Show version information\n" +
 		"\n" +
