@@ -33,5 +33,5 @@ distclean:
 	/bin/rm -rf src/git.ypbind.de/
 	/bin/rm -rf src/golang.org/
 
-all: build strip install
+all: depend build strip install
 
