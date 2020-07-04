@@ -231,9 +231,9 @@ func showUsage() {
 		"\n" +
 		"  add-license\n" +
 		"    -uuid=<uuid>\n" +
-		"       Get license from management board identified by UUID (*)\n" +
+		"       Add license to management board identified by UUID (*)\n" +
 		"    -id=<id>\n" +
-		"       Get license from management board identified by ID (*)\n" +
+		"       Add license to management board identified by ID (*)\n" +
 		"    -license=<lic>\n" +
 		"       License key to add\n" +
 		"    -license-file=<file>\n" +
