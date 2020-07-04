@@ -53,7 +53,7 @@ func main() {
 	trailing := flag.Args()
 
 	if *configFile != "" {
-		// read and parse configuration file
+		// TODO: not implemented yet - read and parse configuration file
 	} else {
 		if *ask {
 			fmt.Print("Password: ")

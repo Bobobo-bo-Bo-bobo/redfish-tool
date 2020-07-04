@@ -6,7 +6,7 @@ import (
 
 func showUsage() {
 	showVersion()
-	fmt.Printf("Usage redfish-tool [-ask] [-config=<cfg>] [-help] [-password=<pass>] [-password-file=<file>]\n" +
+	fmt.Printf("Usage redfish-tool [-ask] [-help] [-password=<pass>] [-password-file=<file>]\n" +
 		"       -user=<user> -host=<host>[,<host>,...] [-verbose] [-timeout <sec>] [-port <port>]\n" +
 		"       [-insecure] [-version] [-format=<format>] <command> [<cmd_options>]\n" +
 		"\n" +
@@ -14,8 +14,6 @@ func showUsage() {
 		"\n" +
 		"  -ask\n" +
 		"    	Ask for password\n" +
-		"  -config=<cfg>\n" +
-		"    	Configuration file to use\n" +
 		"  -debug\n" +
 		"    	Debug operation\n" +
 		"  -format=<format>\n" +
