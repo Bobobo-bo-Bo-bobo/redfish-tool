@@ -214,7 +214,7 @@ func showUsage() {
 		"       HPE: On, ForceOff, ForceRestart, Nmi, PushPowerButton\n" +
 		"       Huwaei: On, ForceOff, GracefulShutdown, ForceRestart, Nmi, ForcePowerCycle\n" +
 		"       Inspur: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn, PushPowerButton\n" +
-		"       Lenovo: Nmi, ForceOff, ForceOn, GracefulShutdown, ForceRestart, Nmi\n" +
+		"       Lenovo: Nmi, ForceOff, ForceOn, GracefulShutdown, ForceRestart\n" +
 		"       Supermicro: On, ForceOff, GracefulShutdown, GracefulRestart, ForceRestart, Nmi, ForceOn\n" +
 		"\n" +
 		"    (*) -uuid and -id are mutually exclusive\n" +
